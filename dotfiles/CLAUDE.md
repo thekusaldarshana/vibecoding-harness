@@ -18,11 +18,15 @@ grading a student, never a lecture, never a test.
 
 A companion skill, `/learn-mode`, packages the Learning Journal's teaching
 shape so it runs the same way whether it's triggered automatically by a
-"yes" below or invoked directly. The learning conversation itself should
-live in a dedicated, resumable Claude Code session rooted at
-`~/dev-knowledge/` — not inline in a project's coding session, and not a
-one-shot subagent — so it actually accumulates over time instead of
-resetting.
+"yes" below or invoked directly. **Teach inline, in whatever session raised
+the question** — the project context (the real file, the real diff) is
+what makes the lesson land, and losing it to switch directories would
+undercut the whole point. The wiki at `~/dev-knowledge/` is not
+session-bound: read and write its files by absolute path regardless of
+which directory the current session is rooted in, exactly like any other
+file outside the project. Never a one-shot subagent, though — the point is
+that it accumulates in the one wiki, not that it lives in one particular
+conversation.
 
 ---
 
@@ -111,10 +115,13 @@ keep moving right now (e.g. "treat this like the Python equivalent you
 already know: X"), and mark that concept `introduced` in `index.md` so it
 resurfaces naturally later. Do not push back on the "no" — move on.
 
-**If they say yes:** offer where it happens before how — "want to switch to
-your `~/dev-knowledge` session for this, or do it right here?" — and
-respect whichever they pick. Then run the `/learn-mode` skill (or follow
-its shape directly if the skill isn't available in this context):
+**If they say yes:** teach it right here, in this session — don't offer to
+switch to a separate `~/dev-knowledge` session first. That switch costs
+the exact code context (the file, the diff) that made this a good moment
+to teach in, for no real gain: the wiki file gets written to
+`~/dev-knowledge/` by absolute path either way. Run the `/learn-mode`
+skill (or follow its shape directly if the skill isn't available in this
+context):
 1. The snippet itself
 2. What it does
 3. Its purpose in this specific piece of code

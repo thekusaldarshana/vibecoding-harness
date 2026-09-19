@@ -96,8 +96,12 @@ mkdir -p ~/dev-knowledge
 cp dev-knowledge/index.md ~/dev-knowledge/index.md
 ```
 
-Then start (and later resume) a dedicated learning session rooted at
-`~/dev-knowledge/`:
+`/learn-mode` teaches inline, right in whichever project session raised the
+question — it writes to `~/dev-knowledge/` by absolute path, which works
+the same no matter which directory the session is rooted in, so there's no
+need to switch sessions just to record a lesson. A separate session rooted
+at `~/dev-knowledge/` is only useful if you want unattached study time not
+tied to any project:
 
 ```bash
 cd ~/dev-knowledge && claude   # first time

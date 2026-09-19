@@ -52,10 +52,13 @@
    automatically inside whichever project you're working in, the first
    time a significant change happens there.
 
-5. Start (and later resume) the dedicated learning session from
-   `~/dev-knowledge/` — e.g. `cd ~/dev-knowledge && claude` the first
-   time, then `/resume` or `claude --resume` after that. Confirm the exact
-   resume command against your installed version rather than assuming.
+5. `/learn-mode` teaches inline in whichever project session raised the
+   question, and writes to `~/dev-knowledge/` by absolute path — no
+   session switch needed. If you ever want unattached study time not tied
+   to a project, start (and later resume) a session rooted there directly:
+   `cd ~/dev-knowledge && claude` the first time, then `/resume` or
+   `claude --resume` after that. Confirm the exact resume command against
+   your installed version rather than assuming.
 
 ## What to expect in practice
 

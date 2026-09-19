@@ -1,6 +1,6 @@
 ---
 name: learn-mode
-description: Teach a code, SWE, or CS concept using a fixed six-part shape, then record it in the user's personal knowledge wiki at ~/dev-knowledge/. Use when they say yes to a "want to pause and learn" offer from the Learning Journal protocol, or when they invoke /learn-mode directly with something they're stuck on.
+description: Teach a code, SWE, or CS concept using a fixed six-part shape (snippet, what it does, why it's here, formal name, general problem it solves, connections), then record it in the user's personal knowledge wiki at ~/dev-knowledge/. Use this whenever the user says yes to a "want to pause and learn" offer from the Learning Journal protocol, invokes /learn-mode directly, or asks something like "what does this syntax mean", "explain this pattern", or "teach me this" about a piece of code or a CS/SWE concept they're unfamiliar with — even if they don't say "learn-mode" explicitly.
 ---
 
 # /learn-mode
@@ -11,10 +11,12 @@ description: Teach a code, SWE, or CS concept using a fixed six-part shape, then
    file and what status it's at (`unseen` / `introduced` / `practiced` /
    `solid`). If a file exists, read it first — extend or correct it,
    never re-teach from zero something already `practiced` or `solid`.
-2. If this fires inside a project's coding session, offer the dedicated
-   space before teaching: "want to switch to your `~/dev-knowledge`
-   session for this, or do it right here?" Do whichever they pick, without
-   pushing toward either.
+2. Teach it right here, in whichever session or project raised the
+   question. Do not offer to switch to a separate `~/dev-knowledge`
+   session — that costs the exact code context that made this worth
+   teaching, and buys nothing: reading and writing `~/dev-knowledge/`
+   files by absolute path works the same regardless of which directory
+   the current session is rooted in.
 
 ## The teaching shape — always these six parts, in this order
 
