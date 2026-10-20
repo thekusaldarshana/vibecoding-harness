@@ -37,6 +37,7 @@ Standalone skills can also be used with other agents that read files and run a s
   - [The Learning Journal](#the-learning-journal)
 - [Skills](#skills)
 - [Layout](#layout)
+- [Customisation](#customisation)
 - [Examples](#examples)
 - [FAQ](#faq)
 - [Contributing](#contributing)
@@ -231,6 +232,17 @@ This repo is a **template** — no one's name or personal details are in
 it. Fill in `{{YOUR_NAME}}` in `dotfiles/CLAUDE.md` before installing. If
 you want your own filled-in copy to sync across machines, keep that in a
 *separate, private* repo — see the note in [FAQ](#faq).
+
+## Customisation
+
+The protocols and skills can be adopted separately. Edit your installed global
+rulebook to match your review preferences and languages; use
+[`dotfiles/CLAUDE.md`](dotfiles/CLAUDE.md) as the reference template. Keep the
+`/learn-mode` command name consistent with the installed skill's `name:` field.
+
+For another agent, follow [the installation guide](SETUP.md#installing-skills-in-other-agents)
+and point its rules at the complete skill folder. Keep personal rules and the
+growing wiki in your private copy when syncing across machines.
 
 ## Examples
 
