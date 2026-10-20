@@ -9,6 +9,9 @@ Good contributions:
 - Improving `SETUP.md` for a Claude Code install/version this wasn't
   verified against.
 - A clearer example in `examples/`.
+- Improvements to a skill under `dotfiles/skills/`: clearer steps, a new banner motif in
+  `readme-craft/scripts/make-banner.mjs`, or a new check in `readme-craft/scripts/check-readme.mjs`.
+  Skill scripts stay zero-dependency and cross-platform (plain Node, no shell-only syntax).
 
 Please keep the core idea intact: the Maintainer Protocol gates
 SIGNIFICANT changes behind a restate-it-back check, and the Learning

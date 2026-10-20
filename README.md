@@ -12,6 +12,7 @@ ever forcing a lesson on you.
 - [How it works](#how-it-works)
   - [The Maintainer Protocol](#the-maintainer-protocol)
   - [The Learning Journal](#the-learning-journal)
+- [Skills](#skills)
 - [Layout](#layout)
 - [Install](#install)
 - [Examples](#examples)
@@ -60,12 +61,25 @@ its formal name → the general problem it solves → what it connects to),
 anchored to your actual code, and records it into a personal wiki at
 `~/dev-knowledge/` that only grows from things you actually hit.
 
+## Skills
+
+Standalone skills you can install on their own, with or without the protocols above:
+
+| Skill | What it does |
+| --- | --- |
+| [`learn-mode`](dotfiles/skills/learn-mode/SKILL.md) | Teaches one concept in a fixed six-part shape and records it in `~/dev-knowledge/`. |
+| [`readme-craft`](dotfiles/skills/readme-craft/SKILL.md) | Writes or restyles a rich, *accurate* README for any repo: it studies and runs the project first, hand-codes a light/dark SVG banner, captures real GIFs, uses GitHub-flavoured Markdown that actually renders, and verifies every link and anchor with a bundled checker. |
+
+Skills are plain Markdown plus small zero-dependency Node scripts, so any agent that can read files and run a shell
+can follow them (Claude Code, Codex, Cursor, Gemini CLI, Copilot). See [SETUP.md](SETUP.md#installing-skills-in-other-agents).
+
 ## Layout
 
 ```
 dotfiles/
   CLAUDE.md                        # global rulebook template (fill in {{YOUR_NAME}})
   skills/learn-mode/SKILL.md       # the /learn-mode skill
+  skills/readme-craft/             # the /readme-craft skill: SKILL.md, references/, scripts/
 dev-knowledge/
   index.md                         # empty starter hub for the knowledge wiki
 examples/
@@ -91,6 +105,9 @@ cp dotfiles/CLAUDE.md ~/.claude/CLAUDE.md   # then fill in {{YOUR_NAME}}
 
 mkdir -p ~/.claude/skills/learn-mode
 cp dotfiles/skills/learn-mode/SKILL.md ~/.claude/skills/learn-mode/SKILL.md
+
+# optional: the README skill (copy the whole folder: it has references/ and scripts/)
+cp -r dotfiles/skills/readme-craft ~/.claude/skills/readme-craft
 
 mkdir -p ~/dev-knowledge
 cp dev-knowledge/index.md ~/dev-knowledge/index.md

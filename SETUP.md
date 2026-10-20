@@ -60,6 +60,27 @@
    `claude --resume` after that. Confirm the exact resume command against
    your installed version rather than assuming.
 
+## Installing skills in other agents
+
+Each skill is a folder: `SKILL.md` (with a `name`/`description` header), plus optional `references/` and
+`scripts/`. Copy the **whole folder**, not just `SKILL.md`. Paths below are common defaults; confirm them against
+your installed version, as they change between releases.
+
+| Agent | Where to put the folder |
+| --- | --- |
+| Claude Code | `~/.claude/skills/<skill>/` (all projects) or `<project>/.claude/skills/<skill>/` (one project) |
+| Codex | `~/.codex/skills/<skill>/` if your version supports skills; otherwise reference it from `AGENTS.md` |
+| Cursor, Gemini CLI, Copilot, others | Anywhere; add a line to the project's `AGENTS.md` / rules file: "To write a README, read `<path>/readme-craft/SKILL.md` and follow it." |
+
+The `readme-craft` scripts need Node.js 18 or newer and nothing else:
+
+```bash
+node ~/.claude/skills/readme-craft/scripts/make-banner.mjs --help
+node ~/.claude/skills/readme-craft/scripts/check-readme.mjs README.md
+```
+
+Then ask your agent something like *"Use readme-craft to rewrite this repo's README."*
+
 ## What to expect in practice
 
 - On routine work (styling, copy, formatting) — nothing changes. No gate,
