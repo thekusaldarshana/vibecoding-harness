@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="300" viewBox="0 0 1280 300" role="img" aria-label="vibecoding-harness: Pair with an agent as a maintainer.">
+  <title>vibecoding-harness: Pair with an agent as a maintainer.</title>
+  <rect width="1280" height="300" rx="20" fill="#101114"/>
+  <text x="72" y="122" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="61" font-weight="700" letter-spacing="-2" fill="#F2F2F0">vibecoding-<tspan fill="#75CBB8">harness</tspan></text>
+  <text x="76" y="172" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="24" fill="#F2F2F0" opacity="0.85">Pair with an agent as a maintainer.</text>
+  <text x="76" y="210" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="20" fill="#9E9E98">Review significant changes · Learn from real code</text>
+  <line x1="880" y1="90" x2="990" y2="60" stroke="#2C2F36" stroke-width="3"/><line x1="990" y1="60" x2="1100" y2="120" stroke="#2C2F36" stroke-width="3"/><line x1="880" y1="90" x2="960" y2="200" stroke="#2C2F36" stroke-width="3"/><line x1="960" y1="200" x2="1100" y2="120" stroke="#2C2F36" stroke-width="3"/><line x1="1100" y1="120" x2="1190" y2="70" stroke="#2C2F36" stroke-width="3"/><line x1="1100" y1="120" x2="1170" y2="220" stroke="#2C2F36" stroke-width="3"/>
+  <circle cx="880" cy="90" r="14" fill="#17181C" stroke="#2C2F36" stroke-width="2"/><circle cx="990" cy="60" r="14" fill="#A8B8F0" stroke="#2C2F36" stroke-width="2"/><circle cx="1100" cy="120" r="22" fill="#75CBB8" stroke="#2C2F36" stroke-width="2"/><circle cx="960" cy="200" r="14" fill="#A8B8F0" stroke="#2C2F36" stroke-width="2"/><circle cx="1190" cy="70" r="14" fill="#17181C" stroke="#2C2F36" stroke-width="2"/><circle cx="1170" cy="220" r="14" fill="#A8B8F0" stroke="#2C2F36" stroke-width="2"/>
+</svg>

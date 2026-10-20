@@ -1,22 +1,45 @@
 # vibecoding-harness
 
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/assets/banner-light.svg">
+  <img src="docs/assets/banner-dark.svg" alt="vibecoding-harness: Pair with an agent as a maintainer." width="100%">
+</picture>
+
+**Review what changes. Learn what you need. Keep shipping.**
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-547B65?style=flat-square)](LICENSE)
+[![Claude Code template](https://img.shields.io/badge/Claude%20Code-template-725C96?style=flat-square)](dotfiles/CLAUDE.md)
+[![Portable agent skills](https://img.shields.io/badge/agent%20skills-portable-416B8B?style=flat-square)](#skills)
+[![Script runtime: Node.js 18+](https://img.shields.io/badge/scripts-Node.js%2018%2B-547B65?style=flat-square)](#use-readme-craft)
+
+**[Quick start](#quick-start)** · **[How it works](#how-it-works)** · **[Skills](#skills)** · **[Examples](#examples)**
+
+</div>
+
 A portable Claude Code setup for pairing with an agent as a **maintainer**,
-not a typist: the agent gates significant changes behind a short
-restate-it-back check, and separately builds your own syntax-level reading
-fluency over time through a personal, cumulative knowledge wiki — without
-ever forcing a lesson on you.
+not a typist: significant changes come with a short restate-it-back check,
+and optional lessons build your syntax-level reading fluency in a personal,
+cumulative knowledge wiki. You never have to accept a lesson to keep moving.
+
+This repository is a **template of instructions and skills**. You copy the
+files into your agent's configuration; the agent follows the protocols.
+Standalone skills can also be used with other agents that read files and run a shell.
 
 ## Contents
 
 - [Why](#why)
+- [Install / quick start](#quick-start)
 - [How it works](#how-it-works)
   - [The Maintainer Protocol](#the-maintainer-protocol)
   - [The Learning Journal](#the-learning-journal)
 - [Skills](#skills)
 - [Layout](#layout)
-- [Install](#install)
 - [Examples](#examples)
 - [FAQ](#faq)
+- [Contributing](#contributing)
 - [License](#license)
 
 ## Why
@@ -28,6 +51,79 @@ visible instead of letting it quietly widen: every significant change
 comes with a patch note and a check that you can say back what it does,
 and every unfamiliar concept gets an optional, low-friction detour into a
 wiki that's actually yours.
+
+<a id="quick-start"></a>
+
+## Install
+
+You need **Git**, **Claude Code**, and a Bash-compatible shell for the commands
+below (macOS or Linux). **Node.js 18+** is needed only if you run the
+`readme-craft` scripts. Check your installed agent's skill locations against
+[SETUP.md](SETUP.md); these paths are common defaults.
+
+```bash
+git clone https://github.com/thekusaldarshana/vibecoding-harness.git
+cd vibecoding-harness
+
+mkdir -p ~/.claude/skills ~/dev-knowledge
+cp -n dotfiles/CLAUDE.md ~/.claude/CLAUDE.md
+cp -Rn dotfiles/skills/learn-mode ~/.claude/skills/
+cp -n dev-knowledge/index.md ~/dev-knowledge/index.md
+```
+
+> [!IMPORTANT]
+> The `-n` copies preserve existing files. Edit `~/.claude/CLAUDE.md` to replace
+> `{{YOUR_NAME}}` and fill in your languages/frameworks. If you already have a
+> global rulebook, merge the two Protocol sections into it. If a skill already
+> exists, compare and merge it manually; these commands do not update existing files.
+> Keep your personal wiki index when installing again.
+
+Optionally install the README skill, including its references and scripts:
+
+```bash
+cp -Rn dotfiles/skills/readme-craft ~/.claude/skills/
+```
+
+Check that the core files are in place:
+
+```bash
+test -f ~/.claude/CLAUDE.md
+test -f ~/.claude/skills/learn-mode/SKILL.md
+test -f ~/dev-knowledge/index.md
+```
+
+These checks exit successfully without output when the files exist. In a
+Claude Code project session with the instructions and skill loaded, ask:
+
+```text
+/learn-mode Explain one unfamiliar construct in the code we're working on.
+```
+
+The lesson stays in that project session and records the concept in
+`~/dev-knowledge/`. See [SETUP.md](SETUP.md) for the full manual setup and
+[other agents](SETUP.md#installing-skills-in-other-agents).
+
+<details>
+<summary><b>Optional: a separate session for unattached study</b></summary>
+
+You do not need to switch sessions to record a lesson. A separate session
+is useful when you want study time that is not tied to a project:
+
+```bash
+cd ~/dev-knowledge
+claude
+```
+
+Later, use `/resume` within Claude Code or:
+
+```bash
+claude --resume
+```
+
+Check `claude --help` and `/help` against your installed version before relying
+on resume flags or personal-skill loading paths.
+
+</details>
 
 ## How it works
 
@@ -61,6 +157,25 @@ its formal name → the general problem it solves → what it connects to),
 anchored to your actual code, and records it into a personal wiki at
 `~/dev-knowledge/` that only grows from things you actually hit.
 
+The two protocols keep review and learning connected without making every
+change a lesson:
+
+```mermaid
+flowchart TD
+    Change[Agent makes a change] --> Kind{Significant or routine?}
+    Kind -->|Significant| Note[WHAT / WHY / HOW patch note]
+    Note --> Restate[You restate it in your own words]
+    Restate --> Log[Record checkpoint in MAINTAINER_LOG.md]
+    Kind -->|Routine| Ship[Ship without a gate]
+    Moment[Unfamiliar syntax or concept] --> Offer{Pause to learn?}
+    Offer -->|Yes| Lesson[Six-part lesson in the current session]
+    Lesson --> Wiki[Update the personal knowledge wiki]
+    Offer -->|No| Minimal[Minimum translation; mark introduced]
+```
+
+These are agent instructions: checkpoints depend on the agent loading and
+following them. The repository does not install a hook that blocks changes.
+
 ## Skills
 
 Standalone skills you can install on their own, with or without the protocols above:
@@ -73,9 +188,28 @@ Standalone skills you can install on their own, with or without the protocols ab
 Skills are plain Markdown plus small zero-dependency Node scripts, so any agent that can read files and run a shell
 can follow them (Claude Code, Codex, Cursor, Gemini CLI, Copilot). See [SETUP.md](SETUP.md#installing-skills-in-other-agents).
 
+### Use readme-craft
+
+Ask your agent:
+
+```text
+Use readme-craft to rewrite this repo's README.
+```
+
+From a repository checkout, you can also run its bundled tools directly:
+
+```bash
+node dotfiles/skills/readme-craft/scripts/make-banner.mjs --help
+node dotfiles/skills/readme-craft/scripts/check-readme.mjs README.md
+```
+
+The checker verifies local links, anchors, image alt text, and obvious secret
+patterns offline. External links are checked only with `--online`.
+The tools use Node.js 18+ with no npm install step.
+
 ## Layout
 
-```
+```text
 dotfiles/
   CLAUDE.md                        # global rulebook template (fill in {{YOUR_NAME}})
   skills/learn-mode/SKILL.md       # the /learn-mode skill
@@ -86,48 +220,17 @@ examples/
   MAINTAINER_LOG.md                # what a project log looks like after a few checkpoints
   dev-knowledge/
     token-bucket-algorithm.md      # what one wiki concept file looks like
+docs/assets/
+  banner-light.svg                 # hand-coded README artwork for light mode
+  banner-dark.svg                  # matching dark-mode artwork
 SETUP.md                           # manual install instructions
+CONTRIBUTING.md                    # scope and contribution guidance
 ```
 
 This repo is a **template** — no one's name or personal details are in
 it. Fill in `{{YOUR_NAME}}` in `dotfiles/CLAUDE.md` before installing. If
 you want your own filled-in copy to sync across machines, keep that in a
 *separate, private* repo — see the note in [FAQ](#faq).
-
-## Install
-
-See [SETUP.md](SETUP.md) for full manual steps. In short:
-
-```bash
-mkdir -p ~/.claude
-cp dotfiles/CLAUDE.md ~/.claude/CLAUDE.md   # then fill in {{YOUR_NAME}}
-# if you already have a global CLAUDE.md, merge the two Protocol sections in instead
-
-mkdir -p ~/.claude/skills/learn-mode
-cp dotfiles/skills/learn-mode/SKILL.md ~/.claude/skills/learn-mode/SKILL.md
-
-# optional: the README skill (copy the whole folder: it has references/ and scripts/)
-cp -r dotfiles/skills/readme-craft ~/.claude/skills/readme-craft
-
-mkdir -p ~/dev-knowledge
-cp dev-knowledge/index.md ~/dev-knowledge/index.md
-```
-
-`/learn-mode` teaches inline, right in whichever project session raised the
-question — it writes to `~/dev-knowledge/` by absolute path, which works
-the same no matter which directory the session is rooted in, so there's no
-need to switch sessions just to record a lesson. A separate session rooted
-at `~/dev-knowledge/` is only useful if you want unattached study time not
-tied to any project:
-
-```bash
-cd ~/dev-knowledge && claude   # first time
-claude --resume                # or /resume from inside a session, later
-```
-
-Verify against your actual Claude Code version before trusting any of the
-above — personal-skill install paths and resume flags can differ between
-installs (`claude --help`, `/help`).
 
 ## Examples
 
@@ -153,6 +256,27 @@ real blast radius.
 **What if the gate gets in the way?**
 Say so — the protocol says explicitly: don't silently relax it under time
 pressure, raise it and decide together whether to adjust it.
+
+**The agent doesn't find `/learn-mode` or follow the protocols. What should I check?**
+Confirm that your installed version loads the global rulebook and the skill
+directory you copied into. Copy the whole skill folder, keep its `name:` field
+consistent with the command, and consult
+[the setup guide](SETUP.md#manual-setup) if `learn-mode` collides with an existing skill.
+
+**Do I need Node.js for the protocols or learning journal?**
+No. Those are Markdown instructions. Node.js 18+ is needed for the two
+`readme-craft` helper scripts; running either script with an older runtime
+can fail. There is no application server or package installation step.
+
+**Why didn't reinstalling update my files?**
+The quick start uses no-clobber copies. Compare the new template with your
+installed files and merge deliberately, keeping your personal rules and wiki notes.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for scope and guidelines. Clearer
+protocol wording, verified setup instructions, worked examples, and improvements
+to the portable skills are welcome. Keep the template generic and personal details out.
 
 ## License
 
