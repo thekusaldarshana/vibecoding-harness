@@ -1,108 +1,106 @@
-# Setup — Maintainer Protocol + Learning Journal
+# Setup
 
-## What these files are
+## Project installation
 
-- `dotfiles/CLAUDE.md` — the global rulebook. Two protocols: how the agent
-  hands you work to review (Maintainer Protocol), and how it teaches you
-  what you don't yet know how to read (Learning Journal). Project-agnostic
-  — it applies everywhere once it's in the right place. Contains a
-  `{{YOUR_NAME}}` placeholder — fill that in with your own name before
-  installing.
-- `dotfiles/skills/learn-mode/SKILL.md` — the `/learn-mode` skill: the
-  six-part teaching procedure, invokable directly or triggered by a "yes"
-  to a learning pause. (Named `learn-mode` rather than `learn` in case
-  `learn` is already taken on your account — if `learn-mode` also
-  collides, pick another distinct name and update the `name:` field here
-  and the `/learn-mode` references in `CLAUDE.md` to match.)
-- `dev-knowledge/index.md` — the starter hub for your personal knowledge
-  wiki. Deliberately empty. It fills up from real sessions, not from a
-  pre-built curriculum.
+Requires Node.js 18+. Clone this repository and run its CLI directly:
 
-## Manual setup
+```bash
+node /path/to/vibecoding-harness/bin/vcharn.mjs init --root /path/to/project --agent all --dry-run
+node /path/to/vibecoding-harness/bin/vcharn.mjs init --root /path/to/project --agent all
+```
 
-1. Fill in `{{YOUR_NAME}}` in `dotfiles/CLAUDE.md`, then put the rulebook
-   where Claude Code loads it for *every* project:
+Substitute real paths. Choose `generic` (default), `codex`, `claude`,
+`cursor`, `gemini`, `copilot`, or `all`. Every installation includes an
+`AGENTS.md` reference to `.vcharn/AGENTS.md`; selected adapters add bridges
+for other agents. Existing instructions and skills are preserved. Read the
+[CLI reference](docs/cli.md) for exact paths and update behavior.
 
-   ```bash
-   mkdir -p ~/.claude
-   cp dotfiles/CLAUDE.md ~/.claude/CLAUDE.md
-   ```
+To use the short command, run `npm install --global .` from this checkout.
+Alternatively use the absolute `node .../bin/vcharn.mjs` invocation throughout.
+No package registry publication is required. No global agent settings are
+modified by `init`.
 
-   If you already have a global `~/.claude/CLAUDE.md`, merge this into it
-   rather than overwriting — keep whatever's already there and add these
-   two protocols underneath.
+In a project session, tell your agent to read `.vcharn/AGENTS.md`. It should
+load skills from `.vcharn/skills/` as needed. The same files support any agent
+with file access and a shell, including environments without skill discovery.
+If native slash commands are unavailable, use plain language or explicitly
+reference the skill file.
 
-2. Put the skill where this Claude Code installation actually expects
-   personal skills to live — check first, this may not be exactly
-   `~/.claude/skills/`:
+## Verification setup
 
-   ```bash
-   mkdir -p ~/.claude/skills/learn-mode
-   cp dotfiles/skills/learn-mode/SKILL.md ~/.claude/skills/learn-mode/SKILL.md
-   ```
+From your target project, run:
 
-3. Create the wiki folder and drop the starter index in it:
+```bash
+vcharn verify init
+vcharn prompt verify-setup
+```
 
-   ```bash
-   mkdir -p ~/dev-knowledge
-   cp dev-knowledge/index.md ~/dev-knowledge/index.md
-   ```
+Ask your agent to follow the printed brief. It inspects the actual app,
+configures test and runtime argv commands, exercises representative user
+journeys, and documents them in `.vcharn/features/README.md` with feature
+pages. No checks are guessed or executed by initialization.
 
-4. No per-project setup beyond this — `MAINTAINER_LOG.md` gets created
-   automatically inside whichever project you're working in, the first
-   time a significant change happens there.
+```bash
+vcharn doctor
+vcharn verify run --dry-run
+vcharn verify run
+```
 
-5. `/learn-mode` teaches inline in whichever project session raised the
-   question, and writes to `~/dev-knowledge/` by absolute path — no
-   session switch needed. If you ever want unattached study time not tied
-   to a project, start (and later resume) a session rooted there directly:
-   `cd ~/dev-knowledge && claude` the first time, then `/resume` or
-   `claude --resume` after that. Confirm the exact resume command against
-   your installed version rather than assuming.
+An empty scaffold fails readiness. Review configured commands before running:
+they inherit your environment and permissions. Logs and reports are stored
+under `.vcharn/evidence/`, ignored by git during project initialization.
+See [verification schemas and limits](docs/cli.md#verification).
+
+## Personal learning wiki
+
+Learning remains optional and occurs in the current project session. The
+agent reads and updates `~/dev-knowledge/` when you request a lesson. To seed
+it manually without replacing existing notes, run from this checkout:
+
+```bash
+mkdir -p ~/dev-knowledge
+cp -n dev-knowledge/index.md ~/dev-knowledge/index.md
+```
+
+If the destination exists, preserve it. Personal notes belong in private
+storage; the CLI never initializes, uploads, or overwrites your wiki. If an
+agent cannot write outside the project, it should teach inline and report
+the unsaved note, then follow its environment's permission process.
 
 ## Installing skills in other agents
 
-Each skill is a folder: `SKILL.md` (with a `name`/`description` header), plus optional `references/` and
-`scripts/`. Copy the **whole folder**, not just `SKILL.md`. Paths below are common defaults; confirm them against
-your installed version, as they change between releases.
+You can use the skills independently. Copy the complete folder from
+`dotfiles/skills/<name>/` into a skill location supported by your installed
+agent, or point its instructions at that folder. Preserve `references/` and
+`scripts/`. There is no universal native skill directory across agents;
+the CLI avoids that dependency by installing a shared project folder.
 
-| Agent | Where to put the folder |
-| --- | --- |
-| Claude Code | `~/.claude/skills/<skill>/` (all projects) or `<project>/.claude/skills/<skill>/` (one project) |
-| Codex | `~/.codex/skills/<skill>/` if your version supports skills; otherwise reference it from `AGENTS.md` |
-| Cursor, Gemini CLI, Copilot, others | Anywhere; add a line to the project's `AGENTS.md` / rules file: "To write a README, read `<path>/readme-craft/SKILL.md` and follow it." |
+For manual global Claude setups, merge `dotfiles/CLAUDE.md` into your existing
+rulebook after replacing `{{YOUR_NAME}}` and choosing your languages. Keep
+personal rules and notes intact. The project's shared protocol
+`dotfiles/AGENTS.md` works without personal placeholders.
 
-The `readme-craft` scripts need Node.js 18 or newer and nothing else:
+The README tools can also run directly:
 
 ```bash
-node ~/.claude/skills/readme-craft/scripts/make-banner.mjs --help
-node ~/.claude/skills/readme-craft/scripts/check-readme.mjs README.md
+node dotfiles/skills/readme-craft/scripts/make-banner.mjs --help
+node dotfiles/skills/readme-craft/scripts/check-readme.mjs README.md
 ```
 
-Then ask your agent something like *"Use readme-craft to rewrite this repo's README."*
+## Migrating an existing installation
 
-## What to expect in practice
+Existing global Claude rules, learn-mode, readme-craft, and personal wiki
+notes remain usable. To add the portable workflows:
 
-- On routine work (styling, copy, formatting) — nothing changes. No gate,
-  no pause.
-- On significant work (new module, schema change, new pattern, core logic)
-  — you'll get a short three-part patch note and be asked to restate it.
-  If you can't, because it's unfamiliar syntax rather than unclear logic,
-  that's the cue for the Learning Journal to offer a pause — not a failure
-  of the protocol, it's the protocol doing its job.
-- The learning offer is always a question, never a lecture you're stuck
-  in. Saying no costs nothing and doesn't need justifying.
-- `~/dev-knowledge/` will look sparse for a while. That's correct — it
-  starts at zero on purpose and only grows from concepts you actually hit
-  in real work, so nothing in it is disconnected from something you
-  needed.
+1. Run `vcharn init --root <project> --agent <agent>`.
+2. Compare the installed `.vcharn/AGENTS.md` against any existing global
+   protocol. Consolidate conflicting custom preferences deliberately.
+3. If you use global skill copies, compare them with the new bundled skills;
+   retain one intended version to avoid ambiguous duplicate discovery.
+4. Set up real verification commands and feature maps for that project.
+5. Save future handoffs with `vcharn checkpoint --file <note.md>` so another
+   agent can recover context using `vcharn recall <phrase>`.
 
-## If this starts to erode
-
-If you notice yourself (or the agent) skipping checkpoints "just this
-once," that's worth noticing rather than powering through — the whole
-point of the trigger being state-based rather than calendar-based is that
-there's no missed day to feel bad about, only work that hasn't reached a
-significant point yet. If it's genuinely getting in the way of shipping,
-that's a reason to adjust the rule out loud, not to quietly stop following
-it.
+Re-running initialization refreshes only marked instruction bridges. Shared
+rules and skill files are preserved, so later upgrades require comparison
+and merging. Initialization does not remove older files or personal notes.

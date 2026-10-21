@@ -1,4 +1,4 @@
-# vibecoding-harness
+# vibecoding-harness · vcharn
 
 <div align="center">
 
@@ -11,284 +11,215 @@
 **Review what changes. Learn what you need. Keep shipping.**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-547B65?style=flat-square)](LICENSE)
-[![Claude Code template](https://img.shields.io/badge/Claude%20Code-template-725C96?style=flat-square)](dotfiles/CLAUDE.md)
+[![Agent instructions](https://img.shields.io/badge/agent%20instructions-portable-725C96?style=flat-square)](dotfiles/AGENTS.md)
 [![Portable agent skills](https://img.shields.io/badge/agent%20skills-portable-416B8B?style=flat-square)](#skills)
-[![Script runtime: Node.js 18+](https://img.shields.io/badge/scripts-Node.js%2018%2B-547B65?style=flat-square)](#use-readme-craft)
+[![Script runtime: Node.js 18+](https://img.shields.io/badge/scripts-Node.js%2018%2B-547B65?style=flat-square)](#quick-start)
 
 **[Quick start](#quick-start)** · **[How it works](#how-it-works)** · **[Skills](#skills)** · **[Examples](#examples)**
 
 </div>
 
-A portable Claude Code setup for pairing with an agent as a **maintainer**,
-not a typist: significant changes come with a short restate-it-back check,
-and optional lessons build your syntax-level reading fluency in a personal,
-cumulative knowledge wiki. You never have to accept a lesson to keep moving.
+**vcharn** pairs any coding agent that can read files and run commands with
+reusable engineering workflows: investigate the system, design through
+experiments, verify real behavior, and keep the maintainer able to explain
+what changed. Claude Code, Codex, Cursor, Gemini, Copilot, and other agents
+can use the same shared instructions.
 
-This repository is a **template of instructions and skills**. You copy the
-files into your agent's configuration; the agent follows the protocols.
-Standalone skills can also be used with other agents that read files and run a shell.
+The harness combines its existing Maintainer Protocol and optional Learning
+Journal with workflows inspired by pstack. The new CLI installs project
+instructions, prints task-specific briefs, runs configured verification
+commands, and saves evidence and portable handoffs. It uses Node.js 18+ with
+no runtime dependencies and does not call an AI provider.
 
-## Contents
+## Quick start
 
-- [Why](#why)
-- [Install / quick start](#quick-start)
-- [How it works](#how-it-works)
-  - [The Maintainer Protocol](#the-maintainer-protocol)
-  - [The Learning Journal](#the-learning-journal)
-- [Skills](#skills)
-- [Layout](#layout)
-- [Customisation](#customisation)
-- [Examples](#examples)
-- [FAQ](#faq)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Why
-
-You don't have to be the one typing the code to be responsible for the
-system. But if you can't explain what changed and why, you're not really
-reviewing it — you're just approving it. This harness makes that gap
-visible instead of letting it quietly widen: every significant change
-comes with a patch note and a check that you can say back what it does,
-and every unfamiliar concept gets an optional, low-friction detour into a
-wiki that's actually yours.
-
-<a id="quick-start"></a>
-
-## Install
-
-You need **Git**, **Claude Code**, and a Bash-compatible shell for the commands
-below (macOS or Linux). **Node.js 18+** is needed only if you run the
-`readme-craft` scripts. Check your installed agent's skill locations against
-[SETUP.md](SETUP.md); these paths are common defaults.
+Clone this repository, then initialize a project:
 
 ```bash
 git clone https://github.com/thekusaldarshana/vibecoding-harness.git
 cd vibecoding-harness
-
-mkdir -p ~/.claude/skills ~/dev-knowledge
-cp -n dotfiles/CLAUDE.md ~/.claude/CLAUDE.md
-cp -Rn dotfiles/skills/learn-mode ~/.claude/skills/
-cp -n dev-knowledge/index.md ~/dev-knowledge/index.md
+node bin/vcharn.mjs init --root /path/to/your-project --agent all --dry-run
+node bin/vcharn.mjs init --root /path/to/your-project --agent all
 ```
 
-> [!IMPORTANT]
-> The `-n` copies preserve existing files. Edit `~/.claude/CLAUDE.md` to replace
-> `{{YOUR_NAME}}` and fill in your languages/frameworks. If you already have a
-> global rulebook, merge the two Protocol sections into it. If a skill already
-> exists, compare and merge it manually; these commands do not update existing files.
-> Keep your personal wiki index when installing again.
+Replace `/path/to/your-project` with your project directory. Use `--agent
+codex`, `claude`, `cursor`, `gemini`, `copilot`, or the default `generic` to
+select instruction bridges. Existing rules and installed skills are
+preserved; only vcharn's marked reference blocks are refreshed.
 
-Optionally install the README skill, including its references and scripts:
+For a named command, install this local checkout:
 
 ```bash
-cp -Rn dotfiles/skills/readme-craft ~/.claude/skills/
+npm install --global .
+vcharn --help
 ```
 
-Check that the core files are in place:
+Alternatively, keep using `node /path/to/vibecoding-harness/bin/vcharn.mjs`.
+This change does not publish the package to npm.
 
-```bash
-test -f ~/.claude/CLAUDE.md
-test -f ~/.claude/skills/learn-mode/SKILL.md
-test -f ~/dev-knowledge/index.md
-```
-
-These checks exit successfully without output when the files exist. In a
-Claude Code project session with the instructions and skill loaded, ask:
+In your project session, ask your agent:
 
 ```text
-/learn-mode Explain one unfamiliar construct in the code we're working on.
+Read .vcharn/AGENTS.md. Use vcharn to investigate and implement this change:
+<your task>. Verify the affected behavior and show the evidence.
 ```
 
-The lesson stays in that project session and records the concept in
-`~/dev-knowledge/`. See [SETUP.md](SETUP.md) for the full manual setup and
-[other agents](SETUP.md#installing-skills-in-other-agents).
-
-<details>
-<summary><b>Optional: a separate session for unattached study</b></summary>
-
-You do not need to switch sessions to record a lesson. A separate session
-is useful when you want study time that is not tied to a project:
+Set up application-specific verification next:
 
 ```bash
-cd ~/dev-knowledge
-claude
+vcharn verify init --root /path/to/your-project
+vcharn prompt verify-setup
 ```
 
-Later, use `/resume` within Claude Code or:
+Have the agent follow the setup brief to inspect the app, configure real
+commands, and catalog user journeys. An empty verification scaffold fails
+readiness. Then, from your project:
 
 ```bash
-claude --resume
+vcharn doctor
+vcharn verify run
 ```
 
-Check `claude --help` and `/help` against your installed version before relying
-on resume flags or personal-skill loading paths.
-
-</details>
+See [SETUP.md](SETUP.md) for installation and migration, and the
+[CLI reference](docs/cli.md) for commands, schemas, and limitations.
 
 ## How it works
 
 ### The Maintainer Protocol
 
-Every non-trivial change gets classified as **SIGNIFICANT** or
-**ROUTINE**:
+Significant changes receive a short **WHAT / WHY / HOW** patch note and a
+request for the maintainer to restate their understanding. These include
+new modules, schema or data-flow changes, core logic, auth, new patterns,
+and anything the maintainer flags as unclear. The agent finishes authorized
+implementation and verification before requesting that checkpoint.
 
-| | Examples | What happens |
-|---|---|---|
-| **SIGNIFICANT** | new module/service, schema or data-flow change, new dependency or pattern, core business logic, security/auth, wide blast radius, or "I don't get this" | A three-part **Patch Note** (WHAT / WHY / HOW), then the agent asks you to restate it in your own words before marking it done. Logged to the project's `MAINTAINER_LOG.md`. |
-| **ROUTINE** | styling, copy, formatting, lint fixes, an already-checkpointed pattern | Ships immediately. No gate. |
-
-When it's unsure, it classifies toward SIGNIFICANT — never guesses toward
-skipping the check. After 5 ROUTINE changes in a row with nothing
-SIGNIFICANT in between, it triggers one lightweight zoom-out so things
-never silently drift past what you could explain end to end.
+Routine changes proceed without a gate. After five consecutive routine
+changes, the agent offers a brief zoom-out. Significant checkpoints and the
+maintainer's actual words go in `MAINTAINER_LOG.md`. Pending restatements
+stay pending; agents must never fabricate them. These are instructions,
+not a hook that mechanically blocks commits. Explicit user preferences
+can adjust the workflow.
 
 ### The Learning Journal
 
-When the agent hits a teachable moment — new syntax, a language feature, a
-CS concept — it doesn't lecture and doesn't silently skip it. It asks:
+Learning is optional and stays in the current project session. When invited,
+`learn-mode` teaches six parts: the real snippet, what it does, its purpose
+here, formal name, general problem, and connections to earlier concepts.
 
-> "There's something we can learn here — want to pause and go into
-> learning mode?"
+The stronger version traces actual runtime mechanics and researches design
+intent from available sources. It distinguishes historical evidence from
+inference, explains relevant alternatives, and offers a short prediction or
+restatement exercise. Notes accumulate in `~/dev-knowledge/`, with status
+`unseen` → `introduced` → `practiced` → `solid` based on demonstrated
+understanding. The CLI does not create or alter that personal wiki.
 
-Say no, and you get the minimum translation needed to keep moving, and the
-concept is marked `introduced` for later. Say yes, and `/learn-mode` runs
-a fixed six-part teaching shape (snippet → what it does → why it's here →
-its formal name → the general problem it solves → what it connects to),
-anchored to your actual code, and records it into a personal wiki at
-`~/dev-knowledge/` that only grows from things you actually hit.
+### Verification and continuity
 
-The two protocols keep review and learning connected without making every
-change a lesson:
+Each project owns `.vcharn/verification.json`, its control tools, and a
+feature map describing real user journeys. `vcharn verify run` executes
+configured argv commands and saves logs and a JSON report. Agents inspect
+runtime observations and assertions before claiming success. Exit zero and
+a runtime label alone do not establish feature coverage.
 
-```mermaid
-flowchart TD
-    Change[Agent makes a change] --> Kind{Significant or routine?}
-    Kind -->|Significant| Note[WHAT / WHY / HOW patch note]
-    Note --> Restate[You restate it in your own words]
-    Restate --> Log[Record checkpoint in MAINTAINER_LOG.md]
-    Kind -->|Routine| Ship[Ship without a gate]
-    Moment[Unfamiliar syntax or concept] --> Offer{Pause to learn?}
-    Offer -->|Yes| Lesson[Six-part lesson in the current session]
-    Lesson --> Wiki[Update the personal knowledge wiki]
-    Offer -->|No| Minimal[Minimum translation; mark introduced]
-```
-
-These are agent instructions: checkpoints depend on the agent loading and
-following them. The repository does not install a hook that blocks changes.
+Session handoffs live in `.vcharn/memory/` and work across agents.
+`vcharn recall <phrase>` searches them, feature maps, and the maintainer log.
+It does not depend on private chat formats. Browser tools, service
+connectors, parallel agents, and cloud runners can help when available;
+the workflows also work sequentially with local tools.
 
 ## Skills
 
-Standalone skills you can install on their own, with or without the protocols above:
-
-| Skill | What it does |
+| Skill | Purpose |
 | --- | --- |
-| [`learn-mode`](dotfiles/skills/learn-mode/SKILL.md) | Teaches one concept in a fixed six-part shape and records it in `~/dev-knowledge/`. |
-| [`readme-craft`](dotfiles/skills/readme-craft/SKILL.md) | Writes or restyles a rich, *accurate* README for any repo: it studies and runs the project first, hand-codes a light/dark SVG banner, captures real GIFs, uses GitHub-flavoured Markdown that actually renders, and verifies every link and anchor with a bundled checker. |
+| [vcharn](dotfiles/skills/vcharn/SKILL.md) | Engineering entry point with investigation, recall, design, planning, and writing references |
+| [verify-app](dotfiles/skills/verify-app/SKILL.md) | Create, run, and maintain reusable verification and feature maps |
+| [learn-mode](dotfiles/skills/learn-mode/SKILL.md) | Teach concepts using grounded mechanics and historical evidence |
+| [readme-craft](dotfiles/skills/readme-craft/SKILL.md) | Study a repository and produce an accurate README with bundled offline checks |
 
-Skills are plain Markdown plus small zero-dependency Node scripts, so any agent that can read files and run a shell
-can follow them (Claude Code, Codex, Cursor, Gemini CLI, Copilot). See [SETUP.md](SETUP.md#installing-skills-in-other-agents).
+Ask for a skill in plain language or read its `SKILL.md` directly. Native
+slash commands depend on your agent. `vcharn skills` lists workflows;
+`vcharn prompt how <topic>` prints instructions to give any agent.
 
-### Use readme-craft
+| Command | Use |
+| --- | --- |
+| `vcharn prompt work <task>` | Implement and verify |
+| `vcharn prompt how <topic>` / `vcharn prompt why <topic>` | Trace behavior or investigate motivation |
+| `vcharn prompt architect <task>` / `vcharn prompt prototype <task>` | Compare interface sketches and experiments |
+| `vcharn prompt learn <concept>` | Teach inline and update knowledge notes |
+| `vcharn prompt maintain` | Refresh verification against current code |
+| `vcharn feature add <slug>` | Scaffold a user journey |
+| `vcharn checkpoint --file note.md` | Save a portable handoff |
+| `vcharn recall <phrase>` | Search project context |
+| `vcharn plan check plan.json` | Validate outcome and proof fields without executing a plan |
 
-Ask your agent:
-
-```text
-Use readme-craft to rewrite this repo's README.
-```
-
-From a repository checkout, you can also run its bundled tools directly:
-
-```bash
-node dotfiles/skills/readme-craft/scripts/make-banner.mjs --help
-node dotfiles/skills/readme-craft/scripts/check-readme.mjs README.md
-```
-
-The checker verifies local links, anchors, image alt text, and obvious secret
-patterns offline. External links are checked only with `--online`.
-The tools use Node.js 18+ with no npm install step.
+The [pstack integration map](docs/pstack-integration.md) explains how the
+article concepts became vcharn workflows. This is an original adaptation of
+the supplied guides, not a copy of the vendor-specific plugin.
 
 ## Layout
 
 ```text
-dotfiles/
-  CLAUDE.md                        # global rulebook template (fill in {{YOUR_NAME}})
-  skills/learn-mode/SKILL.md       # the /learn-mode skill
-  skills/readme-craft/             # the /readme-craft skill: SKILL.md, references/, scripts/
-dev-knowledge/
-  index.md                         # empty starter hub for the knowledge wiki
-examples/
-  MAINTAINER_LOG.md                # what a project log looks like after a few checkpoints
-  dev-knowledge/
-    token-bucket-algorithm.md      # what one wiki concept file looks like
-docs/assets/
-  banner-light.svg                 # hand-coded README artwork for light mode
-  banner-dark.svg                  # matching dark-mode artwork
-SETUP.md                           # manual install instructions
-CONTRIBUTING.md                    # scope and contribution guidance
+bin/vcharn.mjs                  CLI entry point
+lib/cli.mjs                     Installation, workflow briefs, verification, memory
+dotfiles/AGENTS.md              Shared maintainer, learning, and evidence protocols
+dotfiles/CLAUDE.md              Legacy global Claude template
+dotfiles/skills/                Four portable skills and supporting resources
+dev-knowledge/index.md          Optional starter for a personal knowledge wiki
+examples/                       Maintainer log and concept note examples
+docs/cli.md                     Command reference and schemas
+docs/pstack-integration.md      Article concepts and adaptation boundaries
+test/cli.test.mjs               CLI integration tests
 ```
 
-This repo is a **template** — no one's name or personal details are in
-it. Fill in `{{YOUR_NAME}}` in `dotfiles/CLAUDE.md` before installing. If
-you want your own filled-in copy to sync across machines, keep that in a
-*separate, private* repo — see the note in [FAQ](#faq).
-
-## Customisation
-
-The protocols and skills can be adopted separately. Edit your installed global
-rulebook to match your review preferences and languages; use
-[`dotfiles/CLAUDE.md`](dotfiles/CLAUDE.md) as the reference template. Keep the
-`/learn-mode` command name consistent with the installed skill's `name:` field.
-
-For another agent, follow [the installation guide](SETUP.md#installing-skills-in-other-agents)
-and point its rules at the complete skill folder. Keep personal rules and the
-growing wiki in your private copy when syncing across machines.
+Installed projects keep shared rules, skills, verification, feature maps,
+and memory under `.vcharn/`. Agent instruction files reference that folder.
+Evidence is ignored by git; review handoffs before sharing them.
 
 ## Examples
 
-- [`examples/MAINTAINER_LOG.md`](examples/MAINTAINER_LOG.md) — two sample
-  Patch Note entries, with the restated-in-your-own-words line included.
-- [`examples/dev-knowledge/token-bucket-algorithm.md`](examples/dev-knowledge/token-bucket-algorithm.md)
-  — one sample wiki concept file, in the six-part shape.
+- [Maintainer log](examples/MAINTAINER_LOG.md) with sample patch notes and restatements.
+- [Concept note](examples/dev-knowledge/token-bucket-algorithm.md) in the six-part shape.
+- [CLI reference](docs/cli.md) with verification and plan JSON examples.
+
+## Customisation
+
+Edit installed `.vcharn/AGENTS.md` for review preferences and learning
+languages. Adapt control tools and feature maps to your actual app. The
+legacy `dotfiles/CLAUDE.md` template retains `{{YOUR_NAME}}` for manual global
+installs; the shared project protocol uses “the maintainer” directly.
+
+Keep personal wiki notes in a private location. CLI reinstallations preserve
+customized files; compare and merge new skill versions deliberately.
 
 ## FAQ
 
-**Why two repos (this one + a private one)?**
-This one is the reusable, name-redacted starting shape — meant to be
-forked or cloned as-is. Your filled-in `CLAUDE.md` and your actual growing
-`~/dev-knowledge/` wiki are personal and keep changing, so they belong in
-a private repo you symlink into `~/.claude` and `~/dev-knowledge`, synced
-separately across machines.
+**Does vcharn run an agent?** No. It supplies shared instructions and local
+tooling. Your chosen agent reads the workflows and performs the work.
 
-**Does this slow down routine work?**
-No — ROUTINE changes (styling, copy, lint, an already-checkpointed
-pattern) ship with no gate at all. The check only fires for changes with
-real blast radius.
+**Do I need Node.js?** Only for the CLI and bundled scripts. Skills and
+protocols can be read and followed as Markdown without it.
 
-**What if the gate gets in the way?**
-Say so — the protocol says explicitly: don't silently relax it under time
-pressure, raise it and decide together whether to adjust it.
+**Can it control any app automatically?** Configure existing test/runtime
+commands and have an agent build controls for your stack where needed.
+The CLI captures evidence; it cannot invent app-specific acceptance tests.
 
-**The agent doesn't find `/learn-mode` or follow the protocols. What should I check?**
-Confirm that your installed version loads the global rulebook and the skill
-directory you copied into. Copy the whole skill folder, keep its `name:` field
-consistent with the command, and consult
-[the setup guide](SETUP.md#manual-setup) if `learn-mode` collides with an existing skill.
+**Does it install globally or upload data?** `init` writes only to the
+selected project. No AI service, scheduler, or chat upload is configured.
+Verification commands inherit your environment and have your permissions.
 
-**Do I need Node.js for the protocols or learning journal?**
-No. Those are Markdown instructions. Node.js 18+ is needed for the two
-`readme-craft` helper scripts; running either script with an older runtime
-can fail. There is no application server or package installation step.
+**What happened to the old setup?** Existing global Claude instructions,
+learn-mode, readme-craft, and personal wiki files remain usable. See the
+[migration guide](SETUP.md#migrating-an-existing-installation).
 
-**Why didn't reinstalling update my files?**
-The quick start uses no-clobber copies. Compare the new template with your
-installed files and merge deliberately, keeping your personal rules and wiki notes.
+## Development and contributing
 
-## Contributing
+```bash
+npm test
+npm run check:readme
+```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for scope and guidelines. Clearer
-protocol wording, verified setup instructions, worked examples, and improvements
-to the portable skills are welcome. Keep the template generic and personal details out.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Keep scripts dependency-free and
+portable, lessons optional, and verification claims grounded in evidence.
 
 ## License
 

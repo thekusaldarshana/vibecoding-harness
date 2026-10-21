@@ -1,0 +1,29 @@
+{
+  "name": "vcharn",
+  "version": "0.1.0",
+  "description": "Portable engineering workflows for AI coding agents",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "vcharn": "bin/vcharn.mjs"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "dotfiles",
+    "dev-knowledge/index.md",
+    "README.md",
+    "SETUP.md",
+    "LICENSE",
+    "docs",
+    "examples",
+    "CONTRIBUTING.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check:readme": "node dotfiles/skills/readme-craft/scripts/check-readme.mjs README.md"
+  }
+}

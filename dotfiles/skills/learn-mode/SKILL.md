@@ -11,7 +11,13 @@ description: Teach a code, SWE, or CS concept using a fixed six-part shape (snip
    file and what status it's at (`unseen` / `introduced` / `practiced` /
    `solid`). If a file exists, read it first — extend or correct it,
    never re-teach from zero something already `practiced` or `solid`.
-2. Teach it right here, in whichever session or project raised the
+2. Ground the explanation in current implementations and callers. For
+   "how", trace an actual input through runtime behavior. For "why", inspect
+   available git history, tests, and design notes; distinguish documented
+   intent from your inference. Cite file paths or commits for consequential
+   claims. Use the vcharn investigation reference if installed, or perform
+   that research directly. Do not require connectors or subagents.
+3. Teach it right here, in whichever session or project raised the
    question. Do not offer to switch to a separate `~/dev-knowledge`
    session — that costs the exact code context that made this worth
    teaching, and buys nothing: reading and writing `~/dev-knowledge/`
@@ -42,3 +48,19 @@ If this session revealed that something already in the wiki was wrong,
 outdated, or contradicted by what was just taught, correct or remove that
 material now. Never leave an old and a new version of the same
 understanding sitting side by side.
+
+
+## Strengthen the mental model
+
+Keep the six-part shape. Within "purpose here" and "problem it solves",
+explain the relevant tradeoff and one plausible alternative when evidence
+supports it. Show a small trace or runnable experiment if it clarifies the
+mechanics; report only results you actually observed.
+
+Offer a brief prediction or restatement exercise after teaching, without
+forcing one. Advance status from the maintainer's demonstrated understanding,
+not the agent's confidence or the number of explanations. Link prior notes
+and record source paths and the date so examples can be rechecked later.
+Keep the personal concept wiki separate from project session handoffs and
+feature maps. If the wiki is inaccessible, teach inline and report the
+unsaved note; do not claim it was written or silently choose a new location.

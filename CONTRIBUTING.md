@@ -1,22 +1,21 @@
 # Contributing
 
-This is a small, opinionated template, not a framework — most useful
-contributions are small too.
+vcharn combines portable agent instructions with a small dependency-free
+Node.js CLI. Useful contributions improve real verification, evidence-backed
+investigation, maintainers' understanding, and cross-agent portability.
 
-Good contributions:
-- Fixing ambiguity or a broken instruction in `dotfiles/CLAUDE.md` or
-  `dotfiles/skills/learn-mode/SKILL.md`.
-- Improving `SETUP.md` for a Claude Code install/version this wasn't
-  verified against.
-- A clearer example in `examples/`.
-- Improvements to a skill under `dotfiles/skills/`: clearer steps, a new banner motif in
-  `readme-craft/scripts/make-banner.mjs`, or a new check in `readme-craft/scripts/check-readme.mjs`.
-  Skill scripts stay zero-dependency and cross-platform (plain Node, no shell-only syntax).
+Keep the Maintainer Protocol's significant-change restatement checkpoint
+and the Learning Journal's optional six-part lessons. Explain intentional
+changes to those behaviors. Explicit user instructions take precedence over
+the default protocols.
 
-Please keep the core idea intact: the Maintainer Protocol gates
-SIGNIFICANT changes behind a restate-it-back check, and the Learning
-Journal never forces a lesson — it always asks first. PRs that change that
-shape should explain why in the description.
+Keep skill descriptions precise, load detailed references only as needed,
+and avoid dependencies on specific models, cloud agents, or connectors.
+Scripts should use plain Node.js 18+ APIs and literal argv. Preserve existing
+project files during installation and support dry runs for mutations.
+Never include personal details, credentials, or real private transcripts.
 
-No personal names, paths, or identifying details in anything merged here
-— keep the template generic (`{{YOUR_NAME}}`-style placeholders).
+Run `npm test` for CLI changes and `npm run check:readme` for documentation.
+Exercise new runtime behavior, including relevant failures. Skill changes
+should be checked for valid frontmatter, local links, appropriate scope,
+and evidence requirements. Update [CLI docs](docs/cli.md) when behavior changes.

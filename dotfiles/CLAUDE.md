@@ -141,3 +141,13 @@ best understanding, not a history of every pass through it.
 This wiki is global. It is not scoped to any one project — reference it
 from every project's session, in Claude Code or anywhere else this
 protocol is loaded.
+
+
+## Portable vcharn workflows
+
+For project installations made by `vcharn init`, read `.vcharn/AGENTS.md`
+and the relevant skills under `.vcharn/skills/`. For a manual installation,
+read the installed `vcharn` and `verify-app` skills. They add evidence-based
+investigation, reusable verification tools, design experiments, and portable
+handoffs. Their instructions apply with any agent that can read files and
+run a shell. Explicit user instructions take precedence over these defaults.
