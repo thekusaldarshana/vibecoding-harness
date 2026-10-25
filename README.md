@@ -185,8 +185,9 @@ Evidence is ignored by git; review handoffs before sharing them.
 
 Edit installed `.vcharn/AGENTS.md` for review preferences and learning
 languages. Adapt control tools and feature maps to your actual app. The
-legacy `dotfiles/CLAUDE.md` template retains `{{YOUR_NAME}}` for manual global
-installs; the shared project protocol uses “the maintainer” directly.
+global `dotfiles/CLAUDE.md` template uses `{{...}}` placeholders that
+`vcharn home install` fills from your personal data folder; the shared project
+protocol uses “the maintainer” directly.
 
 Keep personal wiki notes in a private location. CLI reinstallations preserve
 customized files; compare and merge new skill versions deliberately.

@@ -87,6 +87,84 @@ test('empty and malformed config do not pass; doctor requires runtime readiness'
   assert.equal(run(root, 'verify', 'run').status, 1);
 });
 
+test('home init scaffolds data; install renders rulebook, links, and never replaces real files', async t => {
+  const data = await project(t), home = await project(t);
+  const runHome = (...args) => {
+    const r = spawnSync(process.execPath, [cli, 'home', ...args, '--data', data, '--json'], { encoding: 'utf8', env: { ...process.env, VCHARN_HOME_DIR: home } });
+    return { status: r.status, data: JSON.parse(r.stdout || r.stderr) };
+  };
+  assert.equal(runHome('install').status, 1);
+  assert.equal(runHome('init', '--dry-run').status, 0);
+  assert.deepEqual(await readdir(data), []);
+  assert.equal(runHome('init').status, 0);
+  await writeFile(path.join(data, 'vcharn-home.json'), JSON.stringify({ version: 1, vars: { YOUR_NAME: 'Ada', YOUR_LANGUAGES: 'Rust, Go' } }));
+  await writeFile(path.join(data, 'rules.md'), '# Personal\nUse metric units.\n');
+  assert.equal(runHome('install', '--dry-run').status, 0);
+  assert.deepEqual(await readdir(home), ['.vcharn']);
+  assert.deepEqual(await readdir(path.join(home, '.vcharn')), ['home.json']);
+  assert.equal(runHome('install').status, 0);
+  const rulebook = await readFile(path.join(home, '.claude/CLAUDE.md'), 'utf8');
+  assert.ok(rulebook.includes('# Personal\nUse metric units.'));
+  assert.ok(rulebook.includes('Ada') && rulebook.includes('(currently: Rust, Go)') && !rulebook.includes('{{'));
+  assert.equal(await readFile(path.join(home, '.codex/AGENTS.md'), 'utf8'), rulebook);
+  assert.ok(await readFile(path.join(home, '.agents/skills/vcharn/SKILL.md'), 'utf8'));
+  assert.ok(await readFile(path.join(home, 'dev-knowledge/index.md'), 'utf8'));
+  assert.ok(runHome('install').data.files.slice(1).every(f => f.action === 'unchanged'));
+  await rm(path.join(home, '.claude/skills/learn-mode'));
+  await mkdir(path.join(home, '.claude/skills/learn-mode'));
+  await writeFile(path.join(home, '.claude/skills/learn-mode/SKILL.md'), 'Mine');
+  const conflict = runHome('install');
+  assert.equal(conflict.status, 1);
+  assert.ok(conflict.data.files.some(f => f.action === 'skipped-real-file'));
+  assert.equal(await readFile(path.join(home, '.claude/skills/learn-mode/SKILL.md'), 'utf8'), 'Mine');
+});
+
+test('home defaults to ~/.vcharn/data and remembers a chosen data folder', async t => {
+  const home = await project(t), chosen = await project(t);
+  const runHome = (...args) => {
+    const r = spawnSync(process.execPath, [cli, 'home', ...args, '--json'], { encoding: 'utf8', env: { ...process.env, VCHARN_HOME_DIR: home } });
+    return { status: r.status, data: JSON.parse(r.stdout || r.stderr) };
+  };
+  assert.equal(runHome('init').data.data, path.join(home, '.vcharn/data'));
+  const starter = JSON.parse(await readFile(path.join(home, '.vcharn/data/vcharn-home.json'), 'utf8'));
+  assert.deepEqual(Object.keys(starter.vars).sort(), ['YOUR_LANGUAGES', 'YOUR_NAME']);
+  assert.match(runHome('install').data.error, /YOUR_NAME/);
+  await writeFile(path.join(home, '.vcharn/data/vcharn-home.json'), JSON.stringify({ version: 1, vars: { YOUR_NAME: 'Ada', YOUR_LANGUAGES: 'Go' }, agents: [{ name: 'gemini', rulebook: '.gemini/GEMINI.md' }] }));
+  assert.equal(runHome('install').status, 0);
+  assert.ok((await readFile(path.join(home, '.gemini/GEMINI.md'), 'utf8')).includes('(currently: Go)'));
+  assert.ok(!(await readdir(home)).includes('.claude'));
+  assert.equal(runHome('init', '--data', chosen).status, 0);
+  assert.equal(JSON.parse(await readFile(path.join(home, '.vcharn/home.json'), 'utf8')).data, chosen);
+  await writeFile(path.join(chosen, 'vcharn-home.json'), JSON.stringify({ version: 1, vars: { YOUR_NAME: 'Ada', YOUR_LANGUAGES: 'Go' } }));
+  assert.equal(runHome('install').data.data, chosen);
+});
+
+test('home init --from clones a personal data repo into ~/.vcharn/data', async t => {
+  const home = await project(t), repo = await project(t);
+  const git = (...a) => assert.equal(spawnSync('git', ['-C', repo, ...a], { encoding: 'utf8' }).status, 0);
+  git('init', '-q');
+  await writeFile(path.join(repo, 'vcharn-home.json'), JSON.stringify({ version: 1, vars: { YOUR_NAME: 'Ada', YOUR_LANGUAGES: 'Rust' } }));
+  await mkdir(path.join(repo, 'dev-knowledge'));
+  await writeFile(path.join(repo, 'dev-knowledge/index.md'), '# My notes\n');
+  git('add', '-A');
+  git('-c', 'user.name=t', '-c', 'user.email=t@example.com', 'commit', '-qm', 'data');
+  const runHome = (...args) => {
+    const r = spawnSync(process.execPath, [cli, 'home', ...args, '--json'], { encoding: 'utf8', env: { ...process.env, VCHARN_HOME_DIR: home } });
+    return { status: r.status, data: JSON.parse(r.stdout || r.stderr) };
+  };
+  assert.equal(runHome('init', '--from', repo, '--dry-run').status, 0);
+  assert.deepEqual(await readdir(home), []);
+  const init = runHome('init', '--from', repo);
+  assert.equal(init.status, 0);
+  assert.equal(init.data.files[0].action, 'cloned');
+  const data = path.join(home, '.vcharn/data');
+  assert.equal(await readFile(path.join(data, 'dev-knowledge/index.md'), 'utf8'), '# My notes\n');
+  assert.ok(await readFile(path.join(data, '.git/HEAD'), 'utf8'));
+  assert.equal(runHome('init', '--from', repo).status, 1);
+  assert.equal(runHome('install').status, 0);
+  assert.ok((await readFile(path.join(home, '.claude/CLAUDE.md'), 'utf8')).includes('(currently: Rust)'));
+});
+
 test('portable memory, feature paths, prompt routing, and plan validation', async t => {
   const root = await project(t);
   run(root, 'verify', 'init');

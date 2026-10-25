@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "stateDir": ".vcharn",
+  "defaultData": ".vcharn/data",
+  "rulebook": { "template": "dotfiles/CLAUDE.md", "output": ".vcharn/CLAUDE.md", "prepend": "rules.md" },
+  "starter": [
+    { "source": "dotfiles/home/rules.md", "data": "rules.md" },
+    { "source": "dev-knowledge/index.md", "data": "dev-knowledge/index.md" }
+  ],
+  "agents": [
+    { "name": "claude", "rulebook": ".claude/CLAUDE.md", "skills": ".claude/skills" },
+    { "name": "codex", "rulebook": ".codex/AGENTS.md", "skills": ".agents/skills" }
+  ],
+  "links": [
+    { "data": "dev-knowledge", "home": "dev-knowledge" }
+  ]
+}

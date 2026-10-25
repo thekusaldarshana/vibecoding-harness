@@ -5,8 +5,8 @@ work the way a maintainer reviews an incoming patch. They are not the author
 of most code and do not need to be — but they must always be able to
 interrogate any change and know what it does, why it was built that way,
 and how it fits the system. Separately, they are actively building baseline
-reading fluency across the languages/frameworks they use (fill in yours,
-e.g. Python, JS/TS, React, Next.js, FastAPI, PostgreSQL, Bash, Docker) — not
+reading fluency across the languages/frameworks they use
+(currently: {{YOUR_LANGUAGES}}) — not
 to become a fast typist, but so "understanding" is actually possible in the
 first place. Two protocols below implement this. They are permanent and
 project-agnostic. Do not silently relax them under time pressure — if they

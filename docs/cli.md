@@ -143,3 +143,56 @@ private chat stores or perform semantic search.
 IDs must be unique lowercase slugs; every task requires nonempty `outcome`,
 `expected`, and `verify` argv. Validation does not prove the plan complete,
 execute tasks, or imply permission to publish changes.
+
+## Personal setup (`vcharn home`)
+
+`vcharn home` keeps your personal data separate from this program. Your data
+folder holds only what is yours. Make it a private git repo to share it across
+machines:
+
+```
+vcharn-home.json   # {"version": 1, "vars": {"YOUR_NAME": "...", ...}}
+rules.md           # optional rules placed above the shared protocol
+dev-knowledge/     # optional learning wiki
+```
+
+`vars` fills every `{{KEY}}` placeholder in `dotfiles/CLAUDE.md`. `init` writes
+the keys the template actually uses; `install` refuses to run while any is empty.
+
+| Command | Effect |
+| --- | --- |
+| `vcharn home init` | Create the data folder (default `~/.vcharn/data`; asks when interactive) |
+| `vcharn home init --from <git-url>` | Clone your existing data repo into place, e.g. on a new machine |
+| `vcharn home init --data <dir>` | Use another folder |
+| `vcharn home install` | Render the rulebook and create the links below |
+
+The chosen folder is saved in `~/.vcharn/home.json`, so later commands need no
+flag. `--from` refuses to clone into a non-empty folder. After cloning, `init`
+only adds starter files the repo lacks.
+
+`install` writes `~/.vcharn/CLAUDE.md` (personal rules, then the rendered
+template) and links it, the bundled skills, and the wiki for each agent:
+
+| Agent | Rulebook link | Skills links |
+| --- | --- | --- |
+| claude | `~/.claude/CLAUDE.md` | `~/.claude/skills/<skill>` |
+| codex | `~/.codex/AGENTS.md` | `~/.agents/skills/<skill>` |
+
+plus `~/dev-knowledge` → `<data>/dev-knowledge` when present. These defaults
+live in [`dotfiles/home.json`](../dotfiles/home.json), not in code. A profile can
+replace them with its own `agents` and `links` arrays (paths relative to your
+home and data folders):
+
+```json
+{
+  "version": 1,
+  "vars": { "YOUR_NAME": "Ada", "YOUR_LANGUAGES": "Rust, Go" },
+  "agents": [{ "name": "gemini", "rulebook": ".gemini/GEMINI.md" }]
+}
+```
+
+Only symlinks are replaced. An existing real file or folder at a link path is
+reported as `skipped-real-file`, left untouched, and the command exits non-zero;
+move it aside and re-run. Re-run after updating vcharn or editing your data.
+`--dry-run` reports every action without writing. The generated rulebook stays
+on the machine and is never written into the data folder.

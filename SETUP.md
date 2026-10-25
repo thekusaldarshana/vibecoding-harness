@@ -75,8 +75,20 @@ agent, or point its instructions at that folder. Preserve `references/` and
 `scripts/`. There is no universal native skill directory across agents;
 the CLI avoids that dependency by installing a shared project folder.
 
-For manual global Claude setups, merge `dotfiles/CLAUDE.md` into your existing
-rulebook after replacing `{{YOUR_NAME}}` and choosing your languages. Keep
+For a global setup across agents, keep your personal details in a separate
+data folder (use `--data <dir>` for a folder you sync, such as a private git
+repo) and let vcharn build and link everything:
+
+```bash
+vcharn home init                 # or: vcharn home init --from <your-data-repo-url>
+vcharn home install --dry-run
+vcharn home install
+```
+
+See [personal setup](docs/cli.md#personal-setup-vcharn-home). Alternatively,
+for manual global Claude setups, merge `dotfiles/CLAUDE.md` into your existing
+rulebook after replacing each `{{...}}` placeholder, such as `{{YOUR_NAME}}`
+and `{{YOUR_LANGUAGES}}`. Keep
 personal rules and notes intact. The project's shared protocol
 `dotfiles/AGENTS.md` works without personal placeholders.
 
