@@ -184,3 +184,18 @@ test('portable memory, feature paths, prompt routing, and plan validation', asyn
   assert.equal(run(root, 'plan', 'check', 'plan.json').status, 1);
   assert.equal(run(root, '--unknown').status, 1);
 });
+
+test('safety and incident workflows print the safety reference, and init installs it', async t => {
+  const root = await project(t);
+  for (const name of ['safety', 'incident']) {
+    const r = run(root, 'prompt', name, 'a task');
+    assert.equal(r.status, 0);
+    assert.ok(r.data.instructions.some(i => i.file.endsWith('safety.md') && i.content.includes('five guards')));
+  }
+  assert.ok(run(root, 'prompt', 'incident').data.instructions.some(i => i.file.endsWith('investigate.md')));
+  assert.equal(run(root, 'init').status, 0);
+  assert.match(await readFile(path.join(root, '.vcharn/skills/vcharn/references/safety.md'), 'utf8'), /not evidence/);
+  assert.match(await readFile(path.join(root, '.vcharn/AGENTS.md'), 'utf8'), /references\/safety\.md/);
+  const skill = await readFile(path.join(root, '.vcharn/skills/vcharn/SKILL.md'), 'utf8');
+  for (const link of skill.matchAll(/\]\((references\/[^)]+)\)/g)) assert.ok(await readFile(path.join(root, '.vcharn/skills/vcharn', link[1]), 'utf8'), link[1]);
+});

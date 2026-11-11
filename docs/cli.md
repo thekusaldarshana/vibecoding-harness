@@ -57,6 +57,7 @@ Installed skills may load additional references on demand.
 | `learn` | Teach inline and update the personal knowledge wiki |
 | `verify-setup`, `verify`, `maintain` | Build, run, or refresh application verification |
 | `write`, `readme` | Technical documents or repository README work |
+| `safety`, `incident` | Guards for tools that start agents, live-test checks, incident method, secret-safe output, merge and deploy care |
 
 For example: `vcharn prompt architect "Design the webhook rate limiter"`.
 Paste the result into an agent, or ask it to run the command and follow the

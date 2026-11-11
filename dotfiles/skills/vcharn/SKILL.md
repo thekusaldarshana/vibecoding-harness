@@ -19,6 +19,7 @@ Choose the smallest relevant workflow and load only that reference:
 | Compare prototypes or design an interface | [design.md](references/design.md) |
 | Break an accepted design into verifiable steps | [plan.md](references/plan.md) |
 | Write a tutorial, guide, reference, or explanation | [writing.md](references/writing.md) |
+| Give an agent a tool, subprocess, permission, schedule, or retry; investigate a live incident; handle secrets; merge or deploy | [safety.md](references/safety.md) |
 
 For feature implementation: identify an observable acceptance condition,
 inspect the affected path, implement, then exercise that path. Use the

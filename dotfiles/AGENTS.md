@@ -150,6 +150,14 @@ Use `skills/verify-app/SKILL.md` to create, maintain, and run the project's
 verification loop. Read only the references relevant to the current task.
 These paths resolve inside `.vcharn/` in CLI installations.
 
+Before you give an agent a tool, subprocess, permission, schedule or retry,
+before you handle an incident, print configuration, merge, or deploy, read
+`skills/vcharn/references/safety.md`. Its rules in short: a claim about what an
+actor can do is not true until you have observed it; a tool that starts an
+agent must be hidden from that agent, capped, killed as a process group on
+timeout, and never tell the caller to retry; after a live test, count
+processes and sessions, not only answers; never print secret values.
+
 State what you observed separately from your hypotheses. Before claiming a
 change works, exercise the affected behavior and report evidence, checks,
 and any blocked coverage. Preserve the Maintainer Protocol's checkpoint:
