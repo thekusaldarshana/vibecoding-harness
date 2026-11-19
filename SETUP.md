@@ -15,9 +15,9 @@ Substitute real paths. Choose `generic` (default), `codex`, `claude`,
 for other agents. Existing instructions and skills are preserved. Read the
 [CLI reference](docs/cli.md) for exact paths and update behavior.
 
-To use the short command, run `npm install --global vibecoding-harness` (or `npm install --global .` from a checkout).
-Alternatively use the absolute `node .../bin/vcharn.mjs` invocation throughout.
-Installing from the npm registry is optional. No global agent settings are
+Install the `vcharn` command with `npm install --global vibecoding-harness`
+(or `npm install --global .` from a checkout). Alternatively use the absolute
+`node .../bin/vcharn.mjs` invocation throughout. No global agent settings are
 modified by `init`.
 
 In a project session, tell your agent to read `.vcharn/AGENTS.md`. It should

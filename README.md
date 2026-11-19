@@ -10,6 +10,8 @@
 
 **Review what changes. Learn what you need. Keep shipping.**
 
+[![npm](https://img.shields.io/npm/v/vibecoding-harness?style=flat-square&color=416B8B)](https://www.npmjs.com/package/vibecoding-harness)
+[![CI](https://img.shields.io/github/actions/workflow/status/thekusaldarshana/vibecoding-harness/ci.yml?branch=master&style=flat-square&label=CI)](https://github.com/thekusaldarshana/vibecoding-harness/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-547B65?style=flat-square)](LICENSE)
 [![Agent instructions](https://img.shields.io/badge/agent%20instructions-portable-725C96?style=flat-square)](dotfiles/AGENTS.md)
 [![Portable agent skills](https://img.shields.io/badge/agent%20skills-portable-416B8B?style=flat-square)](#skills)
@@ -25,21 +27,27 @@ experiments, verify real behavior, and keep the maintainer able to explain
 what changed. Claude Code, Codex, Cursor, Gemini, Copilot, and other agents
 can use the same shared instructions.
 
-The harness combines its existing Maintainer Protocol and optional Learning
-Journal with workflows inspired by pstack. The new CLI installs project
+The harness combines a Maintainer Protocol and an optional Learning
+Journal with workflows inspired by pstack. The CLI installs project
 instructions, prints task-specific briefs, runs configured verification
 commands, and saves evidence and portable handoffs. It uses Node.js 18+ with
 no runtime dependencies and does not call an AI provider.
 
 ## Quick start
 
-Clone this repository, then initialize a project:
+Install from npm. The package is `vibecoding-harness`; the command it adds is
+`vcharn`:
 
 ```bash
-git clone https://github.com/thekusaldarshana/vibecoding-harness.git
-cd vibecoding-harness
-node bin/vcharn.mjs init --root /path/to/your-project --agent all --dry-run
-node bin/vcharn.mjs init --root /path/to/your-project --agent all
+npm install --global vibecoding-harness
+vcharn --help
+```
+
+Then initialize a project:
+
+```bash
+vcharn init --root /path/to/your-project --agent all --dry-run
+vcharn init --root /path/to/your-project --agent all
 ```
 
 Replace `/path/to/your-project` with your project directory. Use `--agent
@@ -47,16 +55,9 @@ codex`, `claude`, `cursor`, `gemini`, `copilot`, or the default `generic` to
 select instruction bridges. Existing rules and installed skills are
 preserved; only vcharn's marked reference blocks are refreshed.
 
-Install from npm (the package is `vibecoding-harness`; the command is `vcharn`):
-
-```bash
-npm install --global vibecoding-harness
-vcharn --help
-```
-
-Or install a local checkout with `npm install --global .`.
-
-Alternatively, keep using `node /path/to/vibecoding-harness/bin/vcharn.mjs`.
+To try it without installing, run `npx --package vibecoding-harness vcharn
+--help`. To hack on it, clone the repository and run `node bin/vcharn.mjs`
+(see [Development](#development-and-contributing)).
 
 In your project session, ask your agent:
 
@@ -235,16 +236,21 @@ The CLI captures evidence; it cannot invent app-specific acceptance tests.
 selected project. No AI service, scheduler, or chat upload is configured.
 Verification commands inherit your environment and have your permissions.
 
-**What happened to the old setup?** Existing global Claude instructions,
+**Upgrading from an older setup?** Existing global Claude instructions,
 learn-mode, readme-craft, and personal wiki files remain usable. See the
 [migration guide](SETUP.md#migrating-an-existing-installation).
 
 ## Development and contributing
 
 ```bash
+git clone https://github.com/thekusaldarshana/vibecoding-harness.git
+cd vibecoding-harness
 npm test
 npm run check:readme
 ```
+
+Releases are published to npm by GitHub Actions with provenance when a GitHub
+release is created.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Keep scripts dependency-free and
 portable, lessons optional, and verification claims grounded in evidence.
