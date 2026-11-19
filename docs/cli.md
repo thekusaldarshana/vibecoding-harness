@@ -58,6 +58,9 @@ Installed skills may load additional references on demand.
 | `verify-setup`, `verify`, `maintain` | Build, run, or refresh application verification |
 | `write`, `readme` | Technical documents or repository README work |
 | `safety`, `incident` | Guards for tools that start agents, live-test checks, incident method, secret-safe output, merge and deploy care |
+| `ingest` | File a raw note into the personal wiki |
+| `ask` | Answer from the personal wiki, then offer to file the synthesis |
+| `lint-notes` | Health-check the personal wiki |
 
 For example: `vcharn prompt architect "Design the webhook rate limiter"`.
 Paste the result into an agent, or ask it to run the command and follow the
@@ -197,3 +200,57 @@ reported as `skipped-real-file`, left untouched, and the command exits non-zero;
 move it aside and re-run. Re-run after updating vcharn or editing your data.
 `--dry-run` reports every action without writing. The generated rulebook stays
 on the machine and is never written into the data folder.
+
+## Personal notes (`vcharn notes`)
+
+Notes follow the LLM-wiki pattern: the user writes raw notes, an agent compiles
+them into a persistent wiki. The raw layer is evidence and never changes; the
+wiki is current understanding and is rewritten as understanding changes.
+
+| Layer | Where | Written by |
+| --- | --- | --- |
+| Raw notes | `<data>/notes/` | the user only; agents read |
+| Reference files | `<data>/refs/` | the user only; copied in, never symlinked |
+| Wiki | `<data>/dev-knowledge/` | the agent (`index.md`, `log.md`, pages) |
+| Schema | `dotfiles/skills/notes/`, global rulebook | project and user |
+
+| Command | Effect |
+| --- | --- |
+| `vcharn notes init [--data <dir>] [--dry-run]` | Add `notes/README.md`, `refs/README.md`, and `dev-knowledge/log.md` to the data folder |
+| `vcharn notes new <slug> [--data <dir>]` | Create `notes/<YYYY-MM-DD>-<slug>.md`; never overwrites |
+| `vcharn notes status [--data <dir>]` | Read-only health report; exits 1 when there are problems |
+
+`status` reads wiki page frontmatter and the index, then reports:
+
+| Problem | Meaning |
+| --- | --- |
+| `unfiled-note` | a raw note no page cites |
+| `changed-source` | the note no longer matches the `sha256` recorded in the citing page |
+| `unindexed-page` | a wiki page with no line in `dev-knowledge/index.md` |
+| `dangling-index-link` | an index line pointing at a missing file |
+| `orphan-page` | a page the index and other pages do not link |
+| `missing-source` | a page citing a note that does not exist |
+| `unsynced-reference` | a symlink under `notes/` or `refs/` pointing outside the data folder; git would sync the link, not the content |
+| `broken-reference` | a symlink whose target does not exist |
+
+Git stores symlinks as target paths, so reference material must be copied into
+`refs/` rather than linked from elsewhere on disk. A relative link to a file
+inside the data folder is fine — the content it points at is committed too.
+
+Provenance lives in the wiki page, not in the note, so raw files stay exactly
+as written:
+
+```yaml
+---
+sources:
+  - path: notes/2026-11-16-postgres-locking.md
+    sha256: 6f1c...e2
+    ingested: 2026-11-16
+---
+```
+
+Ingest, query, and lint procedures live in
+[`dotfiles/skills/notes/`](../dotfiles/skills/notes/SKILL.md) and are reachable
+as `vcharn prompt ingest|ask|lint-notes`. No command calls an AI provider or
+writes to `notes/`.
+

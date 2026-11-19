@@ -142,6 +142,65 @@ This wiki is global. It is not scoped to any one project — reference it
 from every project's session, in Claude Code or anywhere else this
 protocol is loaded.
 
+---
+
+## Protocol 3 — Personal notes feed the wiki (global, cross-project)
+
+{{YOUR_NAME}} writes their own notes. You maintain the wiki built from them.
+Three layers, and the ownership rule is absolute:
+
+- **Raw notes** — `notes/` in the personal data folder (default
+  `~/.vcharn/data/notes/`). These are {{YOUR_NAME}}'s own words. **You read
+  them; you never write them.** Do not edit, rename, move, reformat, or
+  "fix" a raw note, not even a typo — a correction belongs in the wiki page
+  that cites it.
+- **The wiki** — `dev-knowledge/`, the same wiki Protocol 2 describes. You
+  own it entirely: summaries, concept pages, entity pages, comparisons,
+  cross-references, `index.md`, `log.md`.
+- **The schema** — this protocol plus the installed `notes` skill. Follow
+  it; when the conventions stop fitting, propose a change instead of quietly
+  breaking them.
+
+The conflation to avoid: a note is evidence, a wiki page is current
+understanding. Notes are never rewritten to match the wiki, and pages are
+rewritten rather than appended to.
+
+**Locate the data.** Run `vcharn notes status --json` — it prints the
+resolved data folder, every raw note with its `sha256`, which pages cite it,
+and the current problems. Do this before an ingest and after it. Never infer
+what has been filed from filenames.
+
+**Ingest** (the user adds a note, or asks you to file one):
+
+1. Read the note completely, plus anything it references.
+2. Search the wiki before writing — `index.md` first, then `grep -ril` for
+   the key terms. Extend an existing page in preference to creating a
+   near-duplicate.
+3. Write or rewrite the affected pages. Record provenance in their
+   frontmatter: the note's relative path, its `sha256`, and the ingest date.
+4. Add one index line per page, with a one-line summary.
+5. Append a log entry: `## [YYYY-MM-DD] ingest | Title`, sources, pages
+   written, contradictions flagged, next question.
+6. Verify with `vcharn notes status`: the note must read `ingested`, with no
+   `unindexed-page` or `dangling-index-link` problems, and `notes/` must be
+   untouched in git.
+
+**Query.** Read `index.md` first, then the few relevant pages, and answer
+with page citations. Distinguish what the wiki says from what you inferred.
+When an answer is non-trivial, offer to file it back as a page with its index
+line and log entry — good synthesis is knowledge too.
+
+**Lint.** Periodically fix what the tool can see (`unfiled-note`,
+`changed-source`, `unindexed-page`, `dangling-index-link`, `orphan-page`,
+`missing-source`), then read for contradictions, stale claims, missing
+cross-references, and gaps worth filling. Rewrite pages so each reflects
+current understanding; the log and git hold the history.
+
+Load the `notes` skill for the detailed procedures. If it is not installed,
+follow this protocol directly. The wiki is plain markdown in git — never
+write secrets or personal transcripts into it, and never publish it without
+explicit permission.
+
 
 ## Portable vcharn workflows
 

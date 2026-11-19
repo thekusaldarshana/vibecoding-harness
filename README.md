@@ -113,6 +113,28 @@ restatement exercise. Notes accumulate in `~/dev-knowledge/`, with status
 `unseen` → `introduced` → `practiced` → `solid` based on demonstrated
 understanding. The CLI does not create or alter that personal wiki.
 
+### Personal notes and the wiki
+
+Notes follow the LLM-wiki pattern: the user writes raw notes, the agent
+compiles them into a persistent wiki. `notes/` in the personal data folder is
+the user's own writing and is immutable — agents read it, never edit it.
+`dev-knowledge/` is the wiki the agent owns: pages with inline cross-links,
+`index.md` as the catalog, `log.md` as the append-only timeline, and
+provenance in page frontmatter (`path`, `sha256`, ingest date) rather than in
+the note.
+
+`vcharn notes status` is deterministic and read-only: it reports unfiled
+notes, notes that changed after ingest, pages missing from the index, dangling
+index links, and orphan pages, exiting non-zero when there is work to do. The
+`notes` skill turns that queue into a filing pass — extend before creating,
+rewrite rather than append, record contradictions instead of overwriting.
+
+References are the one thing not to symlink: git records a link's target, not
+its content, so a link to `~/Documents/paper.pdf` dangles on every other
+machine. Copy cited files into `refs/` in the data folder; `notes status`
+reports inward links as `unsynced-reference` and dead ones as
+`broken-reference`.
+
 ### Verification and continuity
 
 Each project owns `.vcharn/verification.json`, its control tools, and a
@@ -134,6 +156,7 @@ the workflows also work sequentially with local tools.
 | [vcharn](dotfiles/skills/vcharn/SKILL.md) | Engineering entry point with investigation, recall, design, planning, and writing references |
 | [verify-app](dotfiles/skills/verify-app/SKILL.md) | Create, run, and maintain reusable verification and feature maps |
 | [learn-mode](dotfiles/skills/learn-mode/SKILL.md) | Teach concepts using grounded mechanics and historical evidence |
+| [notes](dotfiles/skills/notes/SKILL.md) | File raw notes into the personal wiki, query it, and lint it |
 | [readme-craft](dotfiles/skills/readme-craft/SKILL.md) | Study a repository and produce an accurate README with bundled offline checks |
 
 Ask for a skill in plain language or read its `SKILL.md` directly. Native
@@ -146,6 +169,9 @@ slash commands depend on your agent. `vcharn skills` lists workflows;
 | `vcharn prompt how <topic>` / `vcharn prompt why <topic>` | Trace behavior or investigate motivation |
 | `vcharn prompt architect <task>` / `vcharn prompt prototype <task>` | Compare interface sketches and experiments |
 | `vcharn prompt learn <concept>` | Teach inline and update knowledge notes |
+| `vcharn prompt ingest <note>` / `vcharn prompt ask <question>` | File a raw note into the personal wiki, or query it |
+| `vcharn notes new <slug>` | Create a dated raw note in your data folder |
+| `vcharn notes status` | Report unfiled notes, stale sources, and index problems |
 | `vcharn prompt maintain` | Refresh verification against current code |
 | `vcharn feature add <slug>` | Scaffold a user journey |
 | `vcharn checkpoint --file note.md` | Save a portable handoff |
@@ -163,7 +189,7 @@ bin/vcharn.mjs                  CLI entry point
 lib/cli.mjs                     Installation, workflow briefs, verification, memory
 dotfiles/AGENTS.md              Shared maintainer, learning, and evidence protocols
 dotfiles/CLAUDE.md              Legacy global Claude template
-dotfiles/skills/                Four portable skills and supporting resources
+dotfiles/skills/                Five portable skills and supporting resources
 dev-knowledge/index.md          Optional starter for a personal knowledge wiki
 examples/                       Maintainer log and concept note examples
 docs/cli.md                     Command reference and schemas

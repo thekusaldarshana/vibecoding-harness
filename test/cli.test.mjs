@@ -199,3 +199,107 @@ test('safety and incident workflows print the safety reference, and init install
   const skill = await readFile(path.join(root, '.vcharn/skills/vcharn/SKILL.md'), 'utf8');
   for (const link of skill.matchAll(/\]\((references\/[^)]+)\)/g)) assert.ok(await readFile(path.join(root, '.vcharn/skills/vcharn', link[1]), 'utf8'), link[1]);
 });
+
+test('notes init and new create the raw layer without overwriting', async t => {
+  const data = await project(t), home = await project(t);
+  const runNotes = (...args) => {
+    const r = spawnSync(process.execPath, [cli, 'notes', ...args, '--data', data, '--json'], { encoding: 'utf8', env: { ...process.env, VCHARN_HOME_DIR: home } });
+    return { status: r.status, data: JSON.parse(r.stdout || r.stderr) };
+  };
+  assert.equal(runNotes('init', '--dry-run').status, 0);
+  assert.deepEqual(await readdir(data), []);
+  const init = runNotes('init');
+  assert.equal(init.status, 0);
+  assert.ok(await readFile(path.join(data, 'notes/README.md'), 'utf8'));
+  assert.ok(await readFile(path.join(data, 'dev-knowledge/log.md'), 'utf8'));
+  assert.ok(runNotes('init').data.files.every(f => f.action === 'preserved'));
+  assert.equal(runNotes('new', 'Bad Slug').status, 1);
+  const created = runNotes('new', 'postgres-locking');
+  assert.equal(created.status, 0);
+  assert.match(created.data.path, /^notes\/\d{4}-\d{2}-\d{2}-postgres-locking\.md$/);
+  const noteFile = created.data.path;
+  assert.match(await readFile(path.join(data, noteFile), 'utf8'), /^# postgres locking\n/);
+  await writeFile(path.join(data, noteFile), 'mine, edited\n');
+  assert.equal(runNotes('new', 'postgres-locking').status, 0);
+  assert.equal(await readFile(path.join(data, noteFile), 'utf8'), 'mine, edited\n');
+});
+
+test('notes status reports unfiled, changed, unindexed, orphan, and dangling problems', async t => {
+  const data = await project(t), home = await project(t);
+  const runNotes = (...args) => {
+    const r = spawnSync(process.execPath, [cli, 'notes', ...args, '--data', data, '--json'], { encoding: 'utf8', env: { ...process.env, VCHARN_HOME_DIR: home } });
+    return { status: r.status, data: JSON.parse(r.stdout || r.stderr) };
+  };
+  runNotes('init');
+  const created = runNotes('new', 'locking');
+  const note = created.data.path;
+  const before = await readFile(path.join(data, note), 'utf8');
+
+  const unfiled = runNotes('status');
+  assert.equal(unfiled.status, 1);
+  assert.equal(unfiled.data.notes.length, 1);
+  assert.equal(unfiled.data.notes[0].state, 'unfiled');
+  assert.ok(unfiled.data.problems.some(p => p.kind === 'unfiled-note' && p.path === note));
+  assert.equal(await readFile(path.join(data, note), 'utf8'), before);
+
+  const hash = unfiled.data.notes[0].sha256;
+  await writeFile(path.join(data, 'dev-knowledge/locking.md'), `---\nsources:\n  - path: ${note}\n    sha256: ${hash}\n    ingested: 2026-11-16\n---\n# Locking\n\nSee [index](index.md).\n`);
+  await writeFile(path.join(data, 'dev-knowledge/index.md'), '# Index\n\n- [Locking](locking.md) — row locks\n');
+
+  const clean = runNotes('status');
+  assert.equal(clean.status, 0);
+  assert.equal(clean.data.notes[0].state, 'ingested');
+  assert.deepEqual(clean.data.notes[0].pages, ['dev-knowledge/locking.md']);
+  assert.equal(clean.data.pages[0].indexed, true);
+  assert.equal(clean.data.pages[0].inbound, 1);
+  assert.equal(await readFile(path.join(data, note), 'utf8'), before);
+
+  await writeFile(path.join(data, 'notes', note.split('/')[1]), 'edited after ingest\n');
+  const changed = runNotes('status');
+  assert.equal(changed.status, 1);
+  assert.equal(changed.data.notes[0].state, 'changed');
+  assert.ok(changed.data.problems.some(p => p.kind === 'changed-source'));
+
+  await writeFile(path.join(data, 'dev-knowledge/orphan.md'), '# Orphan\n');
+  const orphan = runNotes('status');
+  assert.ok(orphan.data.problems.some(p => p.kind === 'unindexed-page' && p.path === 'dev-knowledge/orphan.md'));
+  assert.ok(orphan.data.problems.some(p => p.kind === 'orphan-page' && p.path === 'dev-knowledge/orphan.md'));
+
+  await writeFile(path.join(data, 'dev-knowledge/index.md'), '# Index\n\n- [Gone](gone.md) — missing\n');
+  const dangling = runNotes('status');
+  assert.ok(dangling.data.problems.some(p => p.kind === 'dangling-index-link' && p.detail === 'dev-knowledge/gone.md'));
+
+  await writeFile(path.join(data, 'dev-knowledge/cites.md'), '---\nsources:\n  - path: notes/missing.md\n    sha256: ' + '0'.repeat(64) + '\n---\n# Cites\n');
+  const missing = runNotes('status');
+  assert.ok(missing.data.problems.some(p => p.kind === 'missing-source' && p.path === 'dev-knowledge/cites.md'));
+});
+
+test('notes status resolves the saved data folder and refuses a missing folder', async t => {
+  const home = await project(t);
+  const r = spawnSync(process.execPath, [cli, 'notes', 'status', '--json'], { encoding: 'utf8', env: { ...process.env, VCHARN_HOME_DIR: home } });
+  assert.equal(r.status, 1);
+  assert.match(JSON.parse(r.stderr).error, /No data folder/);
+});
+
+test('notes status flags references git cannot sync', async t => {
+  const data = await project(t), home = await project(t), outside = await project(t);
+  const runNotes = (...args) => {
+    const r = spawnSync(process.execPath, [cli, 'notes', ...args, '--data', data, '--json'], { encoding: 'utf8', env: { ...process.env, VCHARN_HOME_DIR: home } });
+    return { status: r.status, data: JSON.parse(r.stdout || r.stderr) };
+  };
+  assert.equal(runNotes('init').status, 0);
+  assert.ok(await readFile(path.join(data, 'refs/README.md'), 'utf8'));
+  await writeFile(path.join(outside, 'paper.md'), 'external\n');
+  await symlink(path.join(outside, 'paper.md'), path.join(data, 'refs/paper.md'));
+  const unsynced = runNotes('status');
+  assert.equal(unsynced.status, 1);
+  assert.ok(unsynced.data.problems.some(p => p.kind === 'unsynced-reference' && p.path === 'refs/paper.md'));
+
+  await rm(path.join(data, 'refs/paper.md'));
+  await symlink(path.join(outside, 'gone.md'), path.join(data, 'refs/gone.md'));
+  assert.ok(runNotes('status').data.problems.some(p => p.kind === 'broken-reference'));
+
+  await writeFile(path.join(data, 'refs/real.md'), 'inside\n');
+  await symlink('real.md', path.join(data, 'refs/inline.md'));
+  assert.ok(!runNotes('status').data.problems.some(p => p.kind === 'unsynced-reference'));
+});
