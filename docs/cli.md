@@ -2,7 +2,7 @@
 
 Requires Node.js 18+, with no runtime dependencies. Run from a checkout with
 `node /path/to/vibecoding-harness/bin/vcharn.mjs`, or install the checkout
-with `npm install --global /path/to/vibecoding-harness` to use `vcharn`.
+with `npm install --global vibecoding-harness` (or a local path) to use `vcharn`.
 The package has not been published to a registry by this change.
 
 Every command accepts `--root <project>` and `--json`. Errors exit 1; JSON

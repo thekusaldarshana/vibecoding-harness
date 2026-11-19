@@ -47,15 +47,16 @@ codex`, `claude`, `cursor`, `gemini`, `copilot`, or the default `generic` to
 select instruction bridges. Existing rules and installed skills are
 preserved; only vcharn's marked reference blocks are refreshed.
 
-For a named command, install this local checkout:
+Install from npm (the package is `vibecoding-harness`; the command is `vcharn`):
 
 ```bash
-npm install --global .
+npm install --global vibecoding-harness
 vcharn --help
 ```
 
+Or install a local checkout with `npm install --global .`.
+
 Alternatively, keep using `node /path/to/vibecoding-harness/bin/vcharn.mjs`.
-This change does not publish the package to npm.
 
 In your project session, ask your agent:
 
