@@ -51,8 +51,10 @@ vcharn init --root /path/to/your-project --agent all
 ```
 
 Replace `/path/to/your-project` with your project directory. Use `--agent
-codex`, `claude`, `cursor`, `gemini`, `copilot`, or the default `generic` to
-select instruction bridges. Existing rules and installed skills are
+codex`, `claude`, `cursor`, `gemini`, `copilot`, `opencode`, `antigravity`
+(or `agy`), or the default `generic` to select instruction bridges. OpenCode and
+Antigravity also get the skills in `.agents/skills/`, where they discover them
+natively. Existing rules and installed skills are
 preserved; only vcharn's marked reference blocks are refreshed.
 
 To try it without installing, run `npx --package vibecoding-harness vcharn

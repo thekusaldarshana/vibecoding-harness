@@ -38,6 +38,24 @@ test('init dry run, preservation, adapters, and idempotent managed blocks', asyn
   assert.equal(await readFile(custom, 'utf8'), 'Customized lesson');
 });
 
+test('init opencode and antigravity (agy) write AGENTS.md and native .agents/skills', async t => {
+  for (const agent of ['opencode', 'antigravity', 'agy']) {
+    const root = await project(t);
+    const first = run(root, 'init', '--agent', agent);
+    assert.equal(first.status, 0);
+    assert.equal(first.data.agent, agent === 'agy' ? 'antigravity' : agent);
+    assert.ok((await readFile(path.join(root, 'AGENTS.md'), 'utf8')).includes('.vcharn/AGENTS.md'));
+    assert.ok((await readFile(path.join(root, '.agents/skills/learn-mode/SKILL.md'), 'utf8')).startsWith('---'));
+    await assert.rejects(readFile(path.join(root, 'GEMINI.md')));
+    await writeFile(path.join(root, '.agents/skills/learn-mode/SKILL.md'), 'Mine');
+    assert.equal(run(root, 'init', '--agent', agent).status, 0);
+    assert.equal(await readFile(path.join(root, '.agents/skills/learn-mode/SKILL.md'), 'utf8'), 'Mine');
+  }
+  const plain = await project(t);
+  run(plain, 'init');
+  await assert.rejects(readFile(path.join(plain, '.agents/skills/learn-mode/SKILL.md')));
+});
+
 test('init refuses instruction and skill symlinks', async t => {
   const root = await project(t), other = await project(t);
   await writeFile(path.join(other, 'rules.md'), 'Protected');
@@ -108,6 +126,8 @@ test('home init scaffolds data; install renders rulebook, links, and never repla
   assert.ok(rulebook.includes('Ada') && rulebook.includes('(currently: Rust, Go)') && !rulebook.includes('{{'));
   assert.equal(await readFile(path.join(home, '.codex/AGENTS.md'), 'utf8'), rulebook);
   assert.ok(await readFile(path.join(home, '.agents/skills/vcharn/SKILL.md'), 'utf8'));
+  assert.equal(await readFile(path.join(home, '.config/opencode/AGENTS.md'), 'utf8'), rulebook);
+  for (const dir of ['.config/opencode/skills', '.gemini/config/skills']) assert.ok(await readFile(path.join(home, dir, 'learn-mode/SKILL.md'), 'utf8'));
   assert.ok(await readFile(path.join(home, 'dev-knowledge/index.md'), 'utf8'));
   assert.ok(runHome('install').data.files.slice(1).every(f => f.action === 'unchanged'));
   await rm(path.join(home, '.claude/skills/learn-mode'));

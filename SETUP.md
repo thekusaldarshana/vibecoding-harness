@@ -20,6 +20,12 @@ Install the `vcharn` command with `npm install --global vibecoding-harness`
 `node .../bin/vcharn.mjs` invocation throughout. No global agent settings are
 modified by `init`.
 
+For OpenCode and Antigravity (`agy`), use `--agent opencode` or `--agent
+antigravity`. They read `AGENTS.md` and discover skills in `.agents/skills/`.
+For global skills, `vcharn home install` links them into
+`~/.config/opencode/skills` and `~/.gemini/config/skills`; Antigravity does not
+read `~/.agents/skills`.
+
 In a project session, tell your agent to read `.vcharn/AGENTS.md`. It should
 load skills from `.vcharn/skills/` as needed. The same files support any agent
 with file access and a shell, including environments without skill discovery.

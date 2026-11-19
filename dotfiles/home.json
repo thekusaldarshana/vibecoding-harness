@@ -12,7 +12,9 @@
   ],
   "agents": [
     { "name": "claude", "rulebook": ".claude/CLAUDE.md", "skills": ".claude/skills" },
-    { "name": "codex", "rulebook": ".codex/AGENTS.md", "skills": ".agents/skills" }
+    { "name": "codex", "rulebook": ".codex/AGENTS.md", "skills": ".agents/skills" },
+    { "name": "opencode", "rulebook": ".config/opencode/AGENTS.md", "skills": ".config/opencode/skills" },
+    { "name": "antigravity", "skills": ".gemini/config/skills" }
   ],
   "links": [
     { "data": "dev-knowledge", "home": "dev-knowledge" }

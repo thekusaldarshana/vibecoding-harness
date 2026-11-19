@@ -26,7 +26,14 @@ vcharn init --root /path/to/project --agent all
 | `cursor` | `.cursor/rules/vcharn.mdc` |
 | `gemini` | `GEMINI.md` |
 | `copilot` | `.github/copilot-instructions.md` |
+| `opencode` | `AGENTS.md`, plus skills in `.agents/skills/` |
+| `antigravity` (alias `agy`) | `AGENTS.md`, plus skills in `.agents/skills/` |
 | `all` | All of the above |
+
+OpenCode and Antigravity (the `agy` CLI and the IDE) read `AGENTS.md` for rules and
+discover skills in `.agents/skills/<name>/SKILL.md`, so those two adapters also copy
+the bundled skills there. That is what makes a skill such as `learn-mode` appear in
+their skill lists. Existing files are preserved, as with every other install.
 
 These are instruction bridges, not native slash-command registrations. If
 an agent does not automatically load the bridge in your environment, tell
@@ -180,6 +187,8 @@ template) and links it, the bundled skills, and the wiki for each agent:
 | --- | --- | --- |
 | claude | `~/.claude/CLAUDE.md` | `~/.claude/skills/<skill>` |
 | codex | `~/.codex/AGENTS.md` | `~/.agents/skills/<skill>` |
+| opencode | `~/.config/opencode/AGENTS.md` | `~/.config/opencode/skills/<skill>` |
+| antigravity | none | `~/.gemini/config/skills/<skill>` |
 
 plus `~/dev-knowledge` → `<data>/dev-knowledge` when present. These defaults
 live in [`dotfiles/home.json`](../dotfiles/home.json), not in code. A profile can
