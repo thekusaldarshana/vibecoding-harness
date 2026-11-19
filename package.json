@@ -4,6 +4,26 @@
   "description": "Portable engineering workflows for AI coding agents",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thekusaldarshana/vibecoding-harness.git"
+  },
+  "homepage": "https://github.com/thekusaldarshana/vibecoding-harness#readme",
+  "bugs": {
+    "url": "https://github.com/thekusaldarshana/vibecoding-harness/issues"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "claude-code",
+    "codex",
+    "cursor",
+    "gemini",
+    "copilot",
+    "skills",
+    "workflows",
+    "cli"
+  ],
   "bin": {
     "vcharn": "bin/vcharn.mjs"
   },
